@@ -20,6 +20,11 @@ namespace BPConstructs.Contents
             projector = point;
         }
 
+        public void CloseProjector()
+        {
+            projector = new Point16(-1, -1);
+        }
+
         public Point16 CurrProjector()
         {
             return projector;
