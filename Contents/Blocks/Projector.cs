@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.UI;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -45,6 +46,7 @@ namespace BPConstructs.Contents.Blocks
         public override bool RightClick(int x, int y)
         {
             Player player = Main.LocalPlayer;
+            BPCPlayer bpplayer = player.GetModPlayer<BPCPlayer>();
 
             //Should your tile entity bring up a UI, this line is useful to prevent item slots from 
             Main.mouseRightRelease = false;
@@ -91,6 +93,10 @@ namespace BPConstructs.Contents.Blocks
            if(TileUtils.TryGetTileEntityAs(x, y, out ProjectorTE entity))
             {
                 // Do things to your entity here
+                Main.playerInventory = true;
+                bpplayer.OpenProjector(new Point16(x, y));
+
+
                 return true;
             }
 

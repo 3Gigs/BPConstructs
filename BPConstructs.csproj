@@ -13,6 +13,12 @@
     <None Remove="Contents - Copy\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="ExampleButton.cs.ex" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ExampleButton.cs.ex" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
 </Project>
