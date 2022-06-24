@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
-using BPConstructs.Contents.UI;
+using BPConstructs.Contents;
 
 namespace BPConstructs
 {

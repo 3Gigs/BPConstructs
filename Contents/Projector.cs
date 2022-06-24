@@ -9,7 +9,7 @@ using Terraria.Audio;
 using Terraria.Localization;
 using BPConstructs.Utils;
 
-namespace BPConstructs.Contents.Blocks
+namespace BPConstructs.Contents
 {
     internal class Projector : ModTile
     {
@@ -74,11 +74,11 @@ namespace BPConstructs.Contents.Blocks
             if (player.editedChestName)
             {
                 NetMessage.SendData(
-                    MessageID.SyncPlayerChest, 
-                    -1, 
-                    -1, 
+                    MessageID.SyncPlayerChest,
+                    -1,
+                    -1,
                     NetworkText
-                        .FromLiteral(Main.chest[player.chest].name), 
+                        .FromLiteral(Main.chest[player.chest].name),
                     player.chest, 1f, 0f, 0f, 0, 0, 0
                 );
                 player.editedChestName = false;
@@ -90,7 +90,7 @@ namespace BPConstructs.Contents.Blocks
                 Main.npcChatText = string.Empty;
             }
 
-           if(TileUtils.TryGetTileEntityAs(x, y, out ProjectorTE entity))
+            if (TileUtils.TryGetTileEntityAs(x, y, out ProjectorTE entity))
             {
                 // Do things to your entity here
                 Main.playerInventory = true;
@@ -109,7 +109,7 @@ namespace BPConstructs.Contents.Blocks
             Item.NewItem(
                 new EntitySource_TileBreak(x, y),
                 new Vector2(x * 16, y * 16),
-                new Vector2(Projector.WIDTH * 16, Projector.HEIGHT * 16),
+                new Vector2(WIDTH * 16, HEIGHT * 16),
                 item);
 
             Point16 origin = TileUtils.GetTileOrigin(x, y);
