@@ -5,9 +5,8 @@ using Terraria.UI;
 using Terraria.GameContent;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.DataStructures;
-using BPConstructs;
-using log4net;
+using Terraria.GameContent.UI.Elements;
+using BPConstructs.Utils;
 
 namespace BPConstructs.Contents
 {
@@ -110,11 +109,11 @@ namespace BPConstructs.Contents
         public override void Update(GameTime gameTime)
         {
             isMouseDown = Main.mouseLeft ? true : false;
-            Point mouseTileCoord = Main.MouseWorld.ToTileCoordinates(); 
+            Point mouseTileCoord = Main.MouseWorld.ToTileCoordinates();
 
-            if(isMouseDown)
+            if (isMouseDown)
             {
-                if(startTile.X == -1)
+                if (startTile.X == -1)
                 {
                     startTile = mouseTileCoord.ToVector2();
                     lastMouseTile = new Vector2(-1, -1);
@@ -133,7 +132,7 @@ namespace BPConstructs.Contents
             base.Update(gameTime);
         }
     }
-    internal class EditorMode : UIElement
+    internal class CopyModeIcon : UIElement
     {
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -145,35 +144,48 @@ namespace BPConstructs.Contents
                 color);
         }
     }
+    internal class CopyMode : DraggablePanel
+    {
+        public CopyMode()
+        {
+            base.Width.Set(1000f, 0f);
+            base.Height.Set(1000f, 0f);
+        }
+    }
     internal class ArchitectUI : UIState
     {
         AreaRect areaRect;
-        EditorMode btn;
+        CopyModeIcon btn;
+        CopyMode copyMode;
 
-        public override void OnInitialize()
+        public ArchitectUI()
         {
             areaRect = new AreaRect();
-            btn = new EditorMode();
+            btn = new CopyModeIcon();
+            copyMode = new CopyMode();
         }
 
         public override void Update(GameTime gameTime)
         {
-            if(areaRect != null && btn != null)
+            if (areaRect != null && btn != null && copyMode != null)
             {
                 Player player = Main.LocalPlayer;
                 BPCPlayer modPlayer = player.GetModPlayer<BPCPlayer>();
                 if (modPlayer.architectMode == true)
                 {
-                    btn.Update(gameTime);
-                    areaRect.Update(gameTime); 
                     Append(btn);
                     Append(areaRect);
+                    Append(copyMode);
+                    btn.Update(gameTime);
+                    areaRect.Update(gameTime);
+                    copyMode.Update(gameTime);
                     modPlayer.architectMode = false;
                 }
                 else
                 {
                     RemoveChild(btn);
                     RemoveChild(areaRect);
+                    RemoveChild(copyMode);
                 }
             }
         }
