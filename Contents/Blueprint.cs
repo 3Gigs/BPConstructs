@@ -9,7 +9,6 @@ namespace BPConstructs.Contents
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Construction Blueprint");
-            Tooltip.SetDefault("Good artists copy, great artists steal");
         }
         public override void SetDefaults()
         {
@@ -18,6 +17,12 @@ namespace BPConstructs.Contents
             Item.maxStack = 1;
             Item.value = 100;
             Item.rare = ItemRarityID.Orange;
+        }
+
+        public override void HoldItem(Player player)
+        {
+            BPCPlayer modPlayer = Main.LocalPlayer.GetModPlayer<BPCPlayer>();
+            modPlayer.architectMode = true;
         }
     }
 }

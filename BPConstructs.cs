@@ -4,16 +4,18 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 using BPConstructs.Contents;
+using log4net;
 
 namespace BPConstructs
 {
-    public class BPConstructs : ModSystem
+    internal class BPConstructs : ModSystem
     {
-        internal ProjectorState projectorUI;
-        private UserInterface _projectorUI;
+        private UserInterface UI;
+        private ArchitectUI bar;
+        
         public override void UpdateUI(GameTime gameTime)
         {
-            _projectorUI?.Update(gameTime);
+            UI?.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -25,7 +27,7 @@ namespace BPConstructs
                     "YourMod: A Description",
                     delegate
                     {
-                        _projectorUI.Draw(Main.spriteBatch, new GameTime());
+                        UI.Draw(Main.spriteBatch, new GameTime());
                         return true;
                     },
                     InterfaceScaleType.UI)
@@ -35,10 +37,14 @@ namespace BPConstructs
 
         public override void Load()
         {
-            projectorUI = new ProjectorState();
-            projectorUI.Activate();
-            _projectorUI = new UserInterface();
-            _projectorUI.SetState(projectorUI);
+            if(!Main.dedServ)
+            {
+                bar = new ArchitectUI();
+                bar.Activate();
+
+                UI = new UserInterface();
+                UI.SetState(bar);
+            }
         }
     }
 
