@@ -10,7 +10,7 @@ using BPConstructs.Utils;
 
 namespace BPConstructs.Contents
 {
-    internal class AreaRect : UIElement
+    internal class CopyMode : UIElement
     {
         private Vector2 startTile;
         private Vector2 lastMouseTile;
@@ -144,25 +144,25 @@ namespace BPConstructs.Contents
                 color);
         }
     }
-    internal class CopyMode : DraggablePanel
+    internal class CopyModeUI : DraggablePanel
     {
-        public CopyMode()
+        public CopyModeUI()
         {
-            base.Width.Set(1000f, 0f);
-            base.Height.Set(1000f, 0f);
+            base.Width.Set(250f, 0f);
+            base.Height.Set(250f, 0f);
         }
     }
     internal class ArchitectUI : UIState
     {
-        AreaRect areaRect;
+        CopyMode areaRect;
         CopyModeIcon btn;
-        CopyMode copyMode;
+        CopyModeUI copyMode;
 
         public ArchitectUI()
         {
-            areaRect = new AreaRect();
+            areaRect = new CopyMode();
             btn = new CopyModeIcon();
-            copyMode = new CopyMode();
+            copyMode = new CopyModeUI();
         }
 
         public override void Update(GameTime gameTime)
