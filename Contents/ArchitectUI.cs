@@ -36,29 +36,29 @@ namespace BPConstructs.Contents
         {
             Color color = new Color(255, 230, 26);
             Rectangle rect = new Rectangle(0, 0, 1, 1);
-            Vector2 upperLeft;
-            Vector2 bottomRight;
+            Point upperLeft;
+            Point bottomRight;
             
             if(isMouseDown)
             {
-                upperLeft = new Vector2(
+                upperLeft = new Point(
                     Math.Min(startTile.X, lastMouseTile.X), 
                     Math.Min(startTile.Y, lastMouseTile.Y));
-                bottomRight = new Vector2(
+                bottomRight = new Point(
                     Math.Max(startTile.X, lastMouseTile.X) + 1,
                     Math.Max(startTile.Y, lastMouseTile.Y) + 1);
             }
             else
             {
-                upperLeft = Main.MouseWorld.ToTileCoordinates().ToVector2();
-                bottomRight = new Vector2(upperLeft.X + 1, upperLeft.Y + 1);
+                upperLeft = Main.MouseWorld.ToTileCoordinates();
+                bottomRight = new Point(upperLeft.X + 1, upperLeft.Y + 1);
             }
 
-            Vector2 upperLeftScreen = upperLeft * 16f;
+            Vector2 upperLeftScreen = upperLeft.ToVector2() * 16f;
             // Vector2 bottomRightScreen = bottomRight * 16f;
             upperLeftScreen -= Main.screenPosition;
             // bottomRightScreen -= Main.screenPosition;
-            Vector2 offset = bottomRight - upperLeft;
+            Point offset = bottomRight - upperLeft;
 
             if(fill)
                 spriteBatch.Draw(
@@ -68,7 +68,7 @@ namespace BPConstructs.Contents
                     color * 0.6f, 
                     0f, 
                     Vector2.Zero, 
-                    16f * offset, 
+                    16f * offset.ToVector2(), 
                     SpriteEffects.None, 
                     0f);
 
