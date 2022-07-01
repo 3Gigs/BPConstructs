@@ -3,23 +3,27 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.GameContent;
+using Terraria.ObjectData;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.GameContent.UI.Elements;
 using BPConstructs.Utils;
+using log4net;
 
 namespace BPConstructs.Contents
 {
     internal class CopyMode : UIElement
     {
-        private Vector2 startTile;
-        private Vector2 lastMouseTile;
+        private Point startTile;
+        private Point lastMouseTile;
         private bool isMouseDown;
+        private bool isMouseUp;
 
         public override void OnInitialize()
         {
             isMouseDown = false;
-            startTile = new Vector2(-1, -1);
+            isMouseUp = false;
+            startTile = new Point(-1, -1);
+            lastMouseTile = new Point(-1, -1);
 
             base.OnInitialize();
         }
@@ -106,27 +110,74 @@ namespace BPConstructs.Contents
 
         }
 
+        public Tile[,] CloneTiles()
+        {
+            if (startTile.X != -1 && startTile.Y != -1
+                && lastMouseTile.X != -1 && lastMouseTile.Y != -1
+                && startTile != lastMouseTile)
+            {
+                Point upperLeft = new Point(
+                    Math.Min(startTile.X, lastMouseTile.X),
+                    Math.Min(startTile.Y, lastMouseTile.Y));
+                Point lowerRight = new Point(
+                    Math.Max(startTile.X, lastMouseTile.X),
+                    Math.Max(startTile.Y, lastMouseTile.Y));
+                Tile[,] clonedTiles = new Tile[
+                    lowerRight.X - upperLeft.X,
+                    lowerRight.Y - upperLeft.Y];
+
+
+                for (int x = 0; x < lowerRight.X; x++)
+                {
+                    for (int y = 0; y < lowerRight.Y; y++)
+                    {
+                        clonedTiles[x, y] = new Tile();
+                    }
+                }
+
+                for (int i = 0; i < lowerRight.X; i++)
+                {
+                    for (int j = 0; j < lowerRight.Y; j++)
+                    {
+                        if (WorldGen.InWorld(i, j))
+                        {
+                            clonedTiles[i, j] = Main.tile[i, j];
+                        }
+                    }
+                }
+
+                return clonedTiles;
+            }
+            return new Tile[0, 0];
+        }
+
         public override void Update(GameTime gameTime)
         {
             isMouseDown = Main.mouseLeft ? true : false;
+            isMouseUp = Main.mouseLeftRelease ? true : false;
             Point mouseTileCoord = Main.MouseWorld.ToTileCoordinates();
 
             if (isMouseDown)
             {
                 if (startTile.X == -1)
                 {
-                    startTile = mouseTileCoord.ToVector2();
-                    lastMouseTile = new Vector2(-1, -1);
+                    startTile = mouseTileCoord;
+                    lastMouseTile = new Point(-1, -1);
                 }
                 else
                 {
-                    lastMouseTile = mouseTileCoord.ToVector2();
+                    lastMouseTile = mouseTileCoord;
                 }
+            }
+            else if(isMouseUp)
+            {
+                startTile = mouseTileCoord;
+                lastMouseTile = mouseTileCoord;
             }
             else
             {
-                startTile = mouseTileCoord.ToVector2();
-                lastMouseTile = mouseTileCoord.ToVector2();
+                startTile = mouseTileCoord;
+                lastMouseTile = mouseTileCoord;
             }
 
             base.Update(gameTime);
@@ -154,38 +205,38 @@ namespace BPConstructs.Contents
     }
     internal class ArchitectUI : UIState
     {
-        CopyMode areaRect;
+        CopyMode copyMode;
         CopyModeIcon btn;
-        CopyModeUI copyMode;
+        CopyModeUI copyModeUI;
 
         public ArchitectUI()
         {
-            areaRect = new CopyMode();
+            copyMode = new CopyMode();
             btn = new CopyModeIcon();
-            copyMode = new CopyModeUI();
+            copyModeUI = new CopyModeUI();
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (areaRect != null && btn != null && copyMode != null)
+            if (copyMode != null && btn != null && copyModeUI != null)
             {
                 Player player = Main.LocalPlayer;
                 BPCPlayer modPlayer = player.GetModPlayer<BPCPlayer>();
                 if (modPlayer.architectMode == true)
                 {
                     Append(btn);
-                    Append(areaRect);
                     Append(copyMode);
+                    Append(copyModeUI);
                     btn.Update(gameTime);
-                    areaRect.Update(gameTime);
                     copyMode.Update(gameTime);
+                    copyModeUI.Update(gameTime);
                     modPlayer.architectMode = false;
                 }
                 else
                 {
                     RemoveChild(btn);
-                    RemoveChild(areaRect);
                     RemoveChild(copyMode);
+                    RemoveChild(copyModeUI);
                 }
             }
         }
