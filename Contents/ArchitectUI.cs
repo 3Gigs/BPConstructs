@@ -112,6 +112,8 @@ namespace BPConstructs.Contents
 
         public Tile[,] CloneTiles()
         {
+            LogManager.GetLogger("BPConstruct").Info("startTile: " + startTile.ToString() 
+                + "\nlastMouseTile: " + lastMouseTile.ToString());
             if (startTile.X != -1 && startTile.Y != -1
                 && lastMouseTile.X != -1 && lastMouseTile.Y != -1
                 && startTile != lastMouseTile)
@@ -127,17 +129,17 @@ namespace BPConstructs.Contents
                     lowerRight.Y - upperLeft.Y];
 
 
-                for (int x = 0; x < lowerRight.X; x++)
+                for (int x = 0; x < lowerRight.X - upperLeft.X; x++)
                 {
-                    for (int y = 0; y < lowerRight.Y; y++)
+                    for (int y = 0; y < lowerRight.Y - upperLeft.Y; y++)
                     {
                         clonedTiles[x, y] = new Tile();
                     }
                 }
 
-                for (int i = 0; i < lowerRight.X; i++)
+                for (int i = 0; i < lowerRight.X - upperLeft.X; i++)
                 {
-                    for (int j = 0; j < lowerRight.Y; j++)
+                    for (int j = 0; j < lowerRight.Y - upperLeft.Y; j++)
                     {
                         if (WorldGen.InWorld(i, j))
                         {
@@ -157,7 +159,21 @@ namespace BPConstructs.Contents
             isMouseUp = Main.mouseLeftRelease ? true : false;
             Point mouseTileCoord = Main.MouseWorld.ToTileCoordinates();
 
-            if (isMouseDown)
+             if (isMouseUp)
+            {
+                Tile[,] tiles = CloneTiles();
+                for (int i = 0; i < tiles.GetLength(0); i++)
+                {
+                    string output = "";
+                    for (int j = 0; j < tiles.GetLength(1); j++)
+                    {
+                        output += tiles[i, j].ToString();
+                    }
+                }
+                startTile = mouseTileCoord;
+                lastMouseTile = mouseTileCoord;
+            }
+            else if (isMouseDown)
             {
                 if (startTile.X == -1)
                 {
@@ -168,11 +184,6 @@ namespace BPConstructs.Contents
                 {
                     lastMouseTile = mouseTileCoord;
                 }
-            }
-            else if(isMouseUp)
-            {
-                startTile = mouseTileCoord;
-                lastMouseTile = mouseTileCoord;
             }
             else
             {
