@@ -4,6 +4,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.GameContent;
 using Terraria.ObjectData;
+using Terraria.ID;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BPConstructs.Utils;
@@ -112,8 +113,6 @@ namespace BPConstructs.Contents
 
         public Tile[,] CloneTiles()
         {
-            LogManager.GetLogger("BPConstruct").Info("startTile: " + startTile.ToString() 
-                + "\nlastMouseTile: " + lastMouseTile.ToString());
             if (startTile.X != -1 && startTile.Y != -1
                 && lastMouseTile.X != -1 && lastMouseTile.Y != -1
                 && startTile != lastMouseTile)
@@ -124,26 +123,27 @@ namespace BPConstructs.Contents
                 Point lowerRight = new Point(
                     Math.Max(startTile.X, lastMouseTile.X),
                     Math.Max(startTile.Y, lastMouseTile.Y));
+
                 Tile[,] clonedTiles = new Tile[
-                    lowerRight.X - upperLeft.X,
-                    lowerRight.Y - upperLeft.Y];
+                    lowerRight.X - upperLeft.X + 1,
+                    lowerRight.Y - upperLeft.Y + 1];
 
-
-                for (int x = 0; x < lowerRight.X - upperLeft.X; x++)
+                for (int x = 0; x <= lowerRight.X - upperLeft.X; x++)
                 {
-                    for (int y = 0; y < lowerRight.Y - upperLeft.Y; y++)
+                    for (int y = 0; y <= lowerRight.Y - upperLeft.Y; y++)
                     {
                         clonedTiles[x, y] = new Tile();
                     }
                 }
 
-                for (int i = 0; i < lowerRight.X - upperLeft.X; i++)
+                for (int i = 0; i <= lowerRight.X - upperLeft.X; i++)
                 {
-                    for (int j = 0; j < lowerRight.Y - upperLeft.Y; j++)
+                    for (int j = 0; j <= lowerRight.Y - upperLeft.Y; j++)
                     {
-                        if (WorldGen.InWorld(i, j))
+                        if(WorldGen.InWorld(upperLeft.X + i, upperLeft.Y + j))
                         {
-                            clonedTiles[i, j] = Main.tile[i, j];
+                            // clonedTiles[i, j] = Main.tile[minX + i, minY + j];
+                            LogManager.GetLogger("BPConstructs").Info(upperLeft.X + i);
                         }
                     }
                 }
@@ -167,8 +167,9 @@ namespace BPConstructs.Contents
                     string output = "";
                     for (int j = 0; j < tiles.GetLength(1); j++)
                     {
-                        output += tiles[i, j].ToString();
+                        output += tiles[i, j].TileType;
                     }
+                    //LogManager.GetLogger("BPConstructs").Info(output);
                 }
                 startTile = mouseTileCoord;
                 lastMouseTile = mouseTileCoord;
