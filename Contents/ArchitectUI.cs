@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.GameContent;
+using Terraria.Graphics;
 using Terraria.ObjectData;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
@@ -18,6 +19,7 @@ namespace BPConstructs.Contents
         private Point lastMouseTile;
         private bool isMouseDown;
         private bool isMouseUp;
+        private Vector2 mouseUIDiff;
 
         public override void OnInitialize()
         {
@@ -25,41 +27,48 @@ namespace BPConstructs.Contents
             isMouseUp = false;
             startTile = new Point(-1, -1);
             lastMouseTile = new Point(-1, -1);
+            mouseUIDiff = (Main.MouseScreen * Main.UIScale - Main.MouseScreen);
 
             base.OnInitialize();
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
             DrawRect(spriteBatch, isMouseDown);
+            base.Draw(spriteBatch);
         }
 
         public void DrawRect(SpriteBatch spriteBatch, bool fill)
         {
             Color color = new Color(255, 230, 26);
             Rectangle rect = new Rectangle(0, 0, 1, 1);
-            Point upperLeft;
-            Point bottomRight;
+            Point upperLeftTile;
+            Point bottomRightTile;
             
             if(isMouseDown)
             {
-                upperLeft = new Point(
+                upperLeftTile = new Point(
                     Math.Min(startTile.X, lastMouseTile.X), 
                     Math.Min(startTile.Y, lastMouseTile.Y));
-                bottomRight = new Point(
+                bottomRightTile = new Point(
                     Math.Max(startTile.X, lastMouseTile.X) + 1,
                     Math.Max(startTile.Y, lastMouseTile.Y) + 1);
             }
             else
             {
-                upperLeft = Main.MouseWorld.ToTileCoordinates();
-                bottomRight = new Point(upperLeft.X + 1, upperLeft.Y + 1);
+                upperLeftTile = (Main.MouseWorld + mouseUIDiff).ToTileCoordinates();
+                bottomRightTile = new Point(upperLeftTile.X + 1, upperLeftTile.Y + 1);
             }
 
-            Vector2 upperLeftScreen = upperLeft.ToVector2() * 16f;
+            LogManager.GetLogger("BPConstructs").Info("DrawRect upperLeftTile: " + upperLeftTile.ToString() + " lowerRightTile" + bottomRightTile.ToString());
+            LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
+
+
+            Vector2 upperLeftScreen = upperLeftTile.ToVector2() * 16f;
             // Vector2 bottomRightScreen = bottomRight * 16f;
             upperLeftScreen -= Main.screenPosition;
-            // bottomRightScreen -= Main.screenPosition;
-            Point offset = bottomRight - upperLeft;
+            Point offset = bottomRightTile - upperLeftTile;
 
             if(fill)
                 spriteBatch.Draw(
@@ -74,7 +83,7 @@ namespace BPConstructs.Contents
                     0f);
 
             spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
-                upperLeftScreen + Vector2.UnitX * -2f, 
+                upperLeftScreen + Vector2.UnitX * -2f,  
                 new Microsoft.Xna.Framework.Rectangle?(rect), 
                 color, 
                 0f, 
@@ -103,12 +112,12 @@ namespace BPConstructs.Contents
             spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
                 upperLeftScreen + Vector2.UnitY * offset.Y * 16f, 
                 new Microsoft.Xna.Framework.Rectangle?(rect), 
-                color, 0f, 
+                color, 
+                0f, 
                 Vector2.Zero, 
                 new Vector2(offset.X * 16f, 2f), 
                 SpriteEffects.None, 
                 0f);
-
         }
 
         public Tile[,] CloneTiles()
@@ -117,36 +126,40 @@ namespace BPConstructs.Contents
                 && lastMouseTile.X != -1 && lastMouseTile.Y != -1
                 && startTile != lastMouseTile)
             {
-                Point upperLeft = new Point(
+                Point upperLeftTile = new Point(
                     Math.Min(startTile.X, lastMouseTile.X),
                     Math.Min(startTile.Y, lastMouseTile.Y));
-                Point lowerRight = new Point(
+                Point lowerRightTile = new Point(
                     Math.Max(startTile.X, lastMouseTile.X),
                     Math.Max(startTile.Y, lastMouseTile.Y));
 
                 Tile[,] clonedTiles = new Tile[
-                    lowerRight.X - upperLeft.X + 1,
-                    lowerRight.Y - upperLeft.Y + 1];
-
-                for (int x = 0; x <= lowerRight.X - upperLeft.X; x++)
+                    lowerRightTile.X - upperLeftTile.X + 1,
+                    lowerRightTile.Y - upperLeftTile.Y + 1];
+ 
+                for (int x = 0; x <= lowerRightTile.X - upperLeftTile.X; x++)
                 {
-                    for (int y = 0; y <= lowerRight.Y - upperLeft.Y; y++)
+                    for (int y = 0; y <= lowerRightTile.Y - upperLeftTile.Y; y++)
                     {
                         clonedTiles[x, y] = new Tile();
                     }
                 }
-
-                for (int i = 0; i <= lowerRight.X - upperLeft.X; i++)
+                
+                for (int i = 0; i <= lowerRightTile.X - upperLeftTile.X; i++)
                 {
-                    for (int j = 0; j <= lowerRight.Y - upperLeft.Y; j++)
+                    string output = "";
+                    for (int j = 0; j <= lowerRightTile.Y - upperLeftTile.Y; j++)
                     {
-                        if(WorldGen.InWorld(upperLeft.X + i, upperLeft.Y + j))
+                        if(WorldGen.InWorld(upperLeftTile.X + i, upperLeftTile.Y + j))
                         {
-                            // clonedTiles[i, j] = Main.tile[minX + i, minY + j];
-                            LogManager.GetLogger("BPConstructs").Info(upperLeft.X + i);
+                            clonedTiles[i, j] = Framing.GetTileSafely(new Point(upperLeftTile.X + i, upperLeftTile.Y + j));
+                            output += (upperLeftTile.ToString()) + " ";
                         }
                     }
+                    LogManager.GetLogger("BPConstructs").Info(output);
                 }
+                //LogManager.GetLogger("BPConstructs").Info("cloneTiles upperLeftTile: " + upperLeftTile.ToString() + " lowerRightTile" + lowerRightTile.ToString());
+                //LogManager.GetLogger("BPConstructs").Info("cloneTiles mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
 
                 return clonedTiles;
             }
@@ -157,24 +170,10 @@ namespace BPConstructs.Contents
         {
             isMouseDown = Main.mouseLeft ? true : false;
             isMouseUp = Main.mouseLeftRelease ? true : false;
-            Point mouseTileCoord = Main.MouseWorld.ToTileCoordinates();
+            mouseUIDiff = (Main.MouseScreen * Main.UIScale - Main.MouseScreen);
+            Point mouseTileCoord = (Main.MouseWorld + mouseUIDiff).ToTileCoordinates();
 
-             if (isMouseUp)
-            {
-                Tile[,] tiles = CloneTiles();
-                for (int i = 0; i < tiles.GetLength(0); i++)
-                {
-                    string output = "";
-                    for (int j = 0; j < tiles.GetLength(1); j++)
-                    {
-                        output += tiles[i, j].TileType;
-                    }
-                    //LogManager.GetLogger("BPConstructs").Info(output);
-                }
-                startTile = mouseTileCoord;
-                lastMouseTile = mouseTileCoord;
-            }
-            else if (isMouseDown)
+            if (isMouseDown)
             {
                 if (startTile.X == -1)
                 {
@@ -186,11 +185,27 @@ namespace BPConstructs.Contents
                     lastMouseTile = mouseTileCoord;
                 }
             }
-            else
+            if (isMouseUp)
             {
+                Tile[,] tiles = CloneTiles();
+                for (int i = 0; i < tiles.GetLength(0); i++)
+                {
+                    string output = "";
+                    for (int j = 0; j < tiles.GetLength(1); j++)
+                    {
+                        output += TileID.Search.GetName(tiles[i, j].TileType);
+                    }
+                    LogManager.GetLogger("BPConstructs").Info(output);
+                }
                 startTile = mouseTileCoord;
                 lastMouseTile = mouseTileCoord;
             }
+
+            //LogManager.GetLogger("BPConstructs").Info("ScreenPos: " + Main.screenPosition);
+            LogManager.GetLogger("BPConstructs").Info("zoomDiff: ");
+            LogManager.GetLogger("BPConstructs").Info("screenPos" + (Main.MouseScreen.ToTileCoordinates()));
+            LogManager.GetLogger("BPConstructs").Info("xdddd poS" + (Main.MouseScreen * Main.UIScale - Main.MouseScreen));
+
 
             base.Update(gameTime);
         }
