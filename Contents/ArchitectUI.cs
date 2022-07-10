@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BPConstructs.Utils;
 using log4net;
+using Terraria.GameInput;
 
 namespace BPConstructs.Contents
 {
@@ -19,6 +20,7 @@ namespace BPConstructs.Contents
         private Point lastMouseTile;
         private bool isMouseDown;
         private bool isMouseUp;
+        // Fix UI Scaling from affecting DrawRect
         private Vector2 mouseUIDiff;
 
         public override void OnInitialize()
@@ -35,7 +37,10 @@ namespace BPConstructs.Contents
         {
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
-            DrawRect(spriteBatch, isMouseDown);
+            PlayerInput.SetZoom_World();
+            DrawInterface_3_LaserRuler();
+            spriteBatch.End();
+            spriteBatch.Begin();
             base.Draw(spriteBatch);
         }
 
@@ -45,8 +50,8 @@ namespace BPConstructs.Contents
             Rectangle rect = new Rectangle(0, 0, 1, 1);
             Point upperLeftTile;
             Point bottomRightTile;
-            
-            if(isMouseDown)
+
+            if (isMouseDown)
             {
                 upperLeftTile = new Point(
                     Math.Min(startTile.X, lastMouseTile.X), 
@@ -61,13 +66,12 @@ namespace BPConstructs.Contents
                 bottomRightTile = new Point(upperLeftTile.X + 1, upperLeftTile.Y + 1);
             }
 
-            LogManager.GetLogger("BPConstructs").Info("DrawRect upperLeftTile: " + upperLeftTile.ToString() + " lowerRightTile" + bottomRightTile.ToString());
-            LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
+
 
 
             Vector2 upperLeftScreen = upperLeftTile.ToVector2() * 16f;
             // Vector2 bottomRightScreen = bottomRight * 16f;
-            upperLeftScreen -= Main.screenPosition;
+            //upperLeftScreen -= Main.screenPosition;
             Point offset = bottomRightTile - upperLeftTile;
 
             if(fill)
@@ -82,7 +86,7 @@ namespace BPConstructs.Contents
                     SpriteEffects.None, 
                     0f);
 
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
                 upperLeftScreen + Vector2.UnitX * -2f,  
                 new Microsoft.Xna.Framework.Rectangle?(rect), 
                 color, 
@@ -91,7 +95,7 @@ namespace BPConstructs.Contents
                 new Vector2(2f, offset.Y * 16f), 
                 SpriteEffects.None, 
                 0f);
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
                 upperLeftScreen + Vector2.UnitX * offset.X * 16f, 
                 new Microsoft.Xna.Framework.Rectangle?(rect), 
                 color, 
@@ -100,7 +104,7 @@ namespace BPConstructs.Contents
                 new Vector2(2f, offset.Y * 16f), 
                 SpriteEffects.None, 
                 0f);
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
                 upperLeftScreen + Vector2.UnitY * -2f, 
                 new Microsoft.Xna.Framework.Rectangle?(rect), 
                 color, 
@@ -109,7 +113,7 @@ namespace BPConstructs.Contents
                 new Vector2(offset.X * 16f, 2f), 
                 SpriteEffects.None, 
                 0f);
-            spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
                 upperLeftScreen + Vector2.UnitY * offset.Y * 16f, 
                 new Microsoft.Xna.Framework.Rectangle?(rect), 
                 color, 
@@ -118,6 +122,84 @@ namespace BPConstructs.Contents
                 new Vector2(offset.X * 16f, 2f), 
                 SpriteEffects.None, 
                 0f);
+        }
+        private static void DrawInterface_3_LaserRuler()
+        {
+            float num = Main.player[Main.myPlayer].velocity.Length();
+            num = Vector2.Distance(Main.player[Main.myPlayer].position, Main.player[Main.myPlayer].shadowPos[2]);
+            float num2 = 6f;
+            Texture2D value = TextureAssets.MagicPixel.Value;
+            float scale = MathHelper.Lerp(0.2f, 0.7f, MathHelper.Clamp(1f - num / num2, 0f, 1f));
+            Vector2 vec = Main.screenPosition;
+            vec += new Vector2(-50f);
+            vec = vec.ToTileCoordinates().ToVector2() * 16f;
+            int num3 = (Main.screenWidth + 100) / 16;
+            int num4 = (Main.screenHeight + 100) / 16;
+            Point point = Main.MouseWorld.ToTileCoordinates();
+            point.X -= (int)vec.X / 16;
+            point.Y -= (int)vec.Y / 16;
+            Color color = new Color(0.24f, 0.8f, 0.9f, 0.5f) * 0.4f * scale;
+            Color color2 = new Color(1f, 0.8f, 0.9f, 0.5f) * 0.5f * scale;
+            Rectangle value2 = new Rectangle(0, 18, 18, 18);
+            vec -= Vector2.One;
+
+            LogManager.GetLogger("BPConstructs").Info("Vec: " + vec);
+            LogManager.GetLogger("BPConstructs").Info("Point: " + point);
+
+            for (int i = 0; i < num3; i++)
+            {
+                for (int j = 0; j < num4; j++)
+                {
+                    Color color3 = color;
+                    Vector2 zero = Vector2.Zero;
+                    if (i != point.X && j != point.Y)
+                    {
+                        if (i != point.X + 1)
+                        {
+                            value2.X = 0;
+                            value2.Width = 16;
+                        }
+                        else
+                        {
+                            value2.X = 2;
+                            value2.Width = 14;
+                            zero.X = 2f;
+                        }
+                        if (j != point.Y + 1)
+                        {
+                            value2.Y = 18;
+                            value2.Height = 16;
+                        }
+                        else
+                        {
+                            value2.Y = 2;
+                            value2.Height = 14;
+                            zero.Y = 2f;
+                        }
+                        Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(i, j) * 16f - Main.screenPosition + vec + zero, 16f), value2, color3, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    }
+                }
+            }
+            value2 = new Rectangle(0, 0, 16, 18);
+            for (int k = 0; k < num3; k++)
+            {
+                if (k == point.X)
+                {
+                    Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(k, point.Y) * 16f - Main.screenPosition + vec, 16f), new Rectangle(0, 0, 16, 16), color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                }
+                else
+                {
+                    Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(k, point.Y) * 16f - Main.screenPosition + vec, 16f), value2, color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                }
+            }
+            value2 = new Rectangle(0, 0, 18, 16);
+            for (int l = 0; l < num4; l++)
+            {
+                if (l != point.Y)
+                {
+                    Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(point.X, l) * 16f - Main.screenPosition + vec, 16f), value2, color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                }
+            }
         }
 
         public Tile[,] CloneTiles()
@@ -201,11 +283,7 @@ namespace BPConstructs.Contents
                 lastMouseTile = mouseTileCoord;
             }
 
-            //LogManager.GetLogger("BPConstructs").Info("ScreenPos: " + Main.screenPosition);
-            LogManager.GetLogger("BPConstructs").Info("zoomDiff: ");
-            LogManager.GetLogger("BPConstructs").Info("screenPos" + (Main.MouseScreen.ToTileCoordinates()));
-            LogManager.GetLogger("BPConstructs").Info("xdddd poS" + (Main.MouseScreen * Main.UIScale - Main.MouseScreen));
-
+            LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
 
             base.Update(gameTime);
         }
