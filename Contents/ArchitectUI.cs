@@ -18,10 +18,12 @@ namespace BPConstructs.Contents
     {
         private Point startTile;
         private Point lastMouseTile;
+        Vector2 screenPos;
+        Point startScreenTile;
+        Point lastScreenTile;
         private bool isMouseDown;
         private bool isMouseUp;
         // Fix UI Scaling from affecting DrawRect
-        private Vector2 mouseUIDiff;
 
         public override void OnInitialize()
         {
@@ -29,7 +31,13 @@ namespace BPConstructs.Contents
             isMouseUp = false;
             startTile = new Point(-1, -1);
             lastMouseTile = new Point(-1, -1);
-            mouseUIDiff = (Main.MouseScreen * Main.UIScale - Main.MouseScreen);
+
+            screenPos = Main.screenPosition;
+            screenPos += new Vector2(-50f);
+            screenPos = screenPos.ToTileCoordinates().ToVector2() * 16f;
+            startScreenTile = Main.MouseWorld.ToTileCoordinates();
+            startScreenTile.X -= (int)screenPos.X / 16;
+            startScreenTile.Y -= (int)screenPos.Y / 16;
 
             base.OnInitialize();
         }
@@ -38,7 +46,87 @@ namespace BPConstructs.Contents
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.GameViewMatrix.ZoomMatrix);
             PlayerInput.SetZoom_World();
-            DrawInterface_3_LaserRuler();
+
+            Point mouseTileCoord = (Main.MouseWorld).ToTileCoordinates();
+
+            DrawBlueLaserGrid(spriteBatch);
+
+            if (isMouseDown)
+            {
+                if (startTile.X == -1)
+                {
+                    startTile = mouseTileCoord;
+                    lastMouseTile = new Point(-1, -1);
+                }
+                else
+                {
+                    lastMouseTile = mouseTileCoord;
+                }
+
+                LogManager.GetLogger("startTile" + startTile);
+
+                if (startScreenTile.X == -1 && startScreenTile.Y == -1)
+                {
+                    startScreenTile = Main.MouseWorld.ToTileCoordinates();
+                    startScreenTile.X -= (int)screenPos.X / 16;
+                    startScreenTile.Y -= (int)screenPos.Y / 16;
+
+                    lastScreenTile = Main.MouseWorld.ToTileCoordinates();
+                    lastScreenTile.X -= (int)screenPos.X / 16;
+                    lastScreenTile.Y -= (int)screenPos.Y / 16;
+                }
+                else
+                {
+                    lastScreenTile = Main.MouseWorld.ToTileCoordinates();
+                    lastScreenTile.X -= (int)screenPos.X / 16;
+                    lastScreenTile.Y -= (int)screenPos.Y / 16;
+                }
+
+
+                Point upperLeftTile = new Point(
+                    Math.Min(lastScreenTile.X, startScreenTile.X), 
+                    Math.Min(lastScreenTile.Y, startScreenTile.Y));
+                Point bottomRightTile = new Point(
+                    Math.Max(lastScreenTile.X, startScreenTile.X),
+                    Math.Max(lastScreenTile.Y, startScreenTile.Y));
+
+                LogManager.GetLogger("startScreenTile: " + startScreenTile);
+                LogManager.GetLogger("lastScreenTile: " + lastScreenTile);
+
+                DrawCloneLaser(spriteBatch, screenPos, upperLeftTile, bottomRightTile);
+            }
+            else
+            {
+                screenPos = Main.screenPosition;
+                screenPos += new Vector2(-50f);
+                screenPos = screenPos.ToTileCoordinates().ToVector2() * 16f;
+                startScreenTile = new Point(-1, -1);
+                lastScreenTile = Main.MouseWorld.ToTileCoordinates();
+                lastScreenTile.X -= (int)screenPos.X / 16;
+                lastScreenTile.Y -= (int)screenPos.Y / 16;
+
+                DrawCloneLaser(
+                    spriteBatch,
+                    screenPos,
+                    lastScreenTile, 
+                    lastScreenTile);
+            }
+            if (isMouseUp)
+            {
+                Tile[,] tiles = CloneTiles();
+                for (int i = 0; i < tiles.GetLength(0); i++)
+                {
+                    string output = "";
+                    for (int j = 0; j < tiles.GetLength(1); j++)
+                    {
+                        output += TileID.Search.GetName(tiles[i, j].TileType);
+                    }
+                    LogManager.GetLogger("BPConstructs").Info(output);
+                }
+                startTile = mouseTileCoord;
+                lastMouseTile = mouseTileCoord;
+            }
+
             spriteBatch.End();
             spriteBatch.Begin();
             base.Draw(spriteBatch);
@@ -62,12 +150,9 @@ namespace BPConstructs.Contents
             }
             else
             {
-                upperLeftTile = (Main.MouseWorld + mouseUIDiff).ToTileCoordinates();
+                upperLeftTile = (Main.MouseWorld).ToTileCoordinates();
                 bottomRightTile = new Point(upperLeftTile.X + 1, upperLeftTile.Y + 1);
             }
-
-
-
 
             Vector2 upperLeftScreen = upperLeftTile.ToVector2() * 16f;
             // Vector2 bottomRightScreen = bottomRight * 16f;
@@ -123,12 +208,12 @@ namespace BPConstructs.Contents
                 SpriteEffects.None, 
                 0f);
         }
-        private static void DrawInterface_3_LaserRuler()
+        private void DrawBlueLaserGrid(SpriteBatch spriteBatch)
         {
             float num = Main.player[Main.myPlayer].velocity.Length();
             num = Vector2.Distance(Main.player[Main.myPlayer].position, Main.player[Main.myPlayer].shadowPos[2]);
             float num2 = 6f;
-            Texture2D value = TextureAssets.MagicPixel.Value;
+            Texture2D value = TextureAssets.Extra[68].Value;
             float scale = MathHelper.Lerp(0.2f, 0.7f, MathHelper.Clamp(1f - num / num2, 0f, 1f));
             Vector2 vec = Main.screenPosition;
             vec += new Vector2(-50f);
@@ -139,65 +224,45 @@ namespace BPConstructs.Contents
             point.X -= (int)vec.X / 16;
             point.Y -= (int)vec.Y / 16;
             Color color = new Color(0.24f, 0.8f, 0.9f, 0.5f) * 0.4f * scale;
-            Color color2 = new Color(1f, 0.8f, 0.9f, 0.5f) * 0.5f * scale;
             Rectangle value2 = new Rectangle(0, 18, 18, 18);
             vec -= Vector2.One;
 
-            LogManager.GetLogger("BPConstructs").Info("Vec: " + vec);
-            LogManager.GetLogger("BPConstructs").Info("Point: " + point);
+            //LogManager.GetLogger("BPConstructs").Info("Vec: " + (vec / 16f));
+            //LogManager.GetLogger("BPConstructs").Info("Vec Tile: " + Framing.GetTileSafely(vec / 16f));
+            //LogManager.GetLogger("BPConstructs").Info("Point: " + (point.ToVector2() * 16));
+            //LogManager.GetLogger("BPConstructs").Info("Point Tile: " + Framing.GetTileSafely(point.ToVector2() * 16));
 
+            Vector2 zero = Vector2.Zero;
+            value2.X = 2;
+            value2.Width = 16;
+            zero.X = 2f;
+            value2.Y = 2;
+            value2.Height = 16;
+            zero.Y = 2f;
+
+            // Draws the blue laser grid
             for (int i = 0; i < num3; i++)
             {
                 for (int j = 0; j < num4; j++)
                 {
                     Color color3 = color;
-                    Vector2 zero = Vector2.Zero;
-                    if (i != point.X && j != point.Y)
-                    {
-                        if (i != point.X + 1)
-                        {
-                            value2.X = 0;
-                            value2.Width = 16;
-                        }
-                        else
-                        {
-                            value2.X = 2;
-                            value2.Width = 14;
-                            zero.X = 2f;
-                        }
-                        if (j != point.Y + 1)
-                        {
-                            value2.Y = 18;
-                            value2.Height = 16;
-                        }
-                        else
-                        {
-                            value2.Y = 2;
-                            value2.Height = 14;
-                            zero.Y = 2f;
-                        }
-                        Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(i, j) * 16f - Main.screenPosition + vec + zero, 16f), value2, color3, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    }
+
+                    spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(i, j) * 16f - Main.screenPosition + vec + zero, 16f), value2, color3, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 }
             }
-            value2 = new Rectangle(0, 0, 16, 18);
-            for (int k = 0; k < num3; k++)
+        }
+
+        private void DrawCloneLaser(SpriteBatch spriteBatch, Vector2 screenPos, Point startTilePos, Point lastTilePos)
+        {
+            Texture2D texture = TextureAssets.Extra[68].Value;
+
+            Color red = new Color(1f, 0.3f, 0.3f, 0.5f); 
+
+            for (int x = startTilePos.X; x <= lastTilePos.X; x++)
             {
-                if (k == point.X)
+                for(int y = startTilePos.Y; y <= lastTilePos.Y; y++)
                 {
-                    Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(k, point.Y) * 16f - Main.screenPosition + vec, 16f), new Rectangle(0, 0, 16, 16), color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                }
-                else
-                {
-                    Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(k, point.Y) * 16f - Main.screenPosition + vec, 16f), value2, color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                }
-            }
-            value2 = new Rectangle(0, 0, 18, 16);
-            for (int l = 0; l < num4; l++)
-            {
-                if (l != point.Y)
-                {
-                    Main.spriteBatch.Draw(value, Main.ReverseGravitySupport(new Vector2(point.X, l) * 16f - Main.screenPosition + vec, 16f), value2, color2, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                    spriteBatch.Draw(texture, Main.ReverseGravitySupport(new Vector2(x, y) * 16f - Main.screenPosition + screenPos, 16f), new Rectangle(0, 0, 18, 18), red, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 }
             }
         }
@@ -250,40 +315,10 @@ namespace BPConstructs.Contents
 
         public override void Update(GameTime gameTime)
         {
-            isMouseDown = Main.mouseLeft ? true : false;
-            isMouseUp = Main.mouseLeftRelease ? true : false;
-            mouseUIDiff = (Main.MouseScreen * Main.UIScale - Main.MouseScreen);
-            Point mouseTileCoord = (Main.MouseWorld + mouseUIDiff).ToTileCoordinates();
+            isMouseDown = Main.mouseLeft;
+            isMouseUp = Main.mouseLeftRelease;
 
-            if (isMouseDown)
-            {
-                if (startTile.X == -1)
-                {
-                    startTile = mouseTileCoord;
-                    lastMouseTile = new Point(-1, -1);
-                }
-                else
-                {
-                    lastMouseTile = mouseTileCoord;
-                }
-            }
-            if (isMouseUp)
-            {
-                Tile[,] tiles = CloneTiles();
-                for (int i = 0; i < tiles.GetLength(0); i++)
-                {
-                    string output = "";
-                    for (int j = 0; j < tiles.GetLength(1); j++)
-                    {
-                        output += TileID.Search.GetName(tiles[i, j].TileType);
-                    }
-                    LogManager.GetLogger("BPConstructs").Info(output);
-                }
-                startTile = mouseTileCoord;
-                lastMouseTile = mouseTileCoord;
-            }
-
-            LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
+            //LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
 
             base.Update(gameTime);
         }
