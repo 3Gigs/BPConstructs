@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -6,6 +7,7 @@ using Terraria.GameContent;
 using Terraria.Graphics;
 using Terraria.ObjectData;
 using Terraria.ID;
+using Terraria.GameContent.UI.Elements;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BPConstructs.Utils;
@@ -23,6 +25,7 @@ namespace BPConstructs.Contents
         Point lastScreenTile;
         private bool isMouseDown;
         private bool isMouseUp;
+        public static Tile[,] clonedTiles;
         // Fix UI Scaling from affecting DrawRect
 
         public override void OnInitialize()
@@ -31,6 +34,7 @@ namespace BPConstructs.Contents
             isMouseUp = false;
             startTile = new Point(-1, -1);
             lastMouseTile = new Point(-1, -1);
+            clonedTiles = new Tile[0, 0];
 
             screenPos = Main.screenPosition;
             screenPos += new Vector2(-50f);
@@ -38,6 +42,7 @@ namespace BPConstructs.Contents
             startScreenTile = Main.MouseWorld.ToTileCoordinates();
             startScreenTile.X -= (int)screenPos.X / 16;
             startScreenTile.Y -= (int)screenPos.Y / 16;
+
 
             base.OnInitialize();
         }
@@ -84,7 +89,7 @@ namespace BPConstructs.Contents
 
 
                 Point upperLeftTile = new Point(
-                    Math.Min(lastScreenTile.X, startScreenTile.X), 
+                    Math.Min(lastScreenTile.X, startScreenTile.X),
                     Math.Min(lastScreenTile.Y, startScreenTile.Y));
                 Point bottomRightTile = new Point(
                     Math.Max(lastScreenTile.X, startScreenTile.X),
@@ -108,7 +113,7 @@ namespace BPConstructs.Contents
                 DrawCloneLaser(
                     spriteBatch,
                     screenPos,
-                    lastScreenTile, 
+                    lastScreenTile,
                     lastScreenTile);
             }
             if (isMouseUp)
@@ -180,11 +185,11 @@ namespace BPConstructs.Contents
         {
             Texture2D texture = TextureAssets.Extra[68].Value;
 
-            Color red = new Color(1f, 0.3f, 0.3f, 0.5f); 
+            Color red = new Color(1f, 0.3f, 0.3f, 0.5f);
 
             for (int x = startTilePos.X; x <= lastTilePos.X; x++)
             {
-                for(int y = startTilePos.Y; y <= lastTilePos.Y; y++)
+                for (int y = startTilePos.Y; y <= lastTilePos.Y; y++)
                 {
                     spriteBatch.Draw(texture, Main.ReverseGravitySupport(new Vector2(x, y) * 16f - Main.screenPosition + screenPos, 16f), new Rectangle(0, 0, 18, 18), red, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 }
@@ -207,7 +212,7 @@ namespace BPConstructs.Contents
                 Tile[,] clonedTiles = new Tile[
                     lowerRightTile.X - upperLeftTile.X + 1,
                     lowerRightTile.Y - upperLeftTile.Y + 1];
- 
+
                 for (int x = 0; x <= lowerRightTile.X - upperLeftTile.X; x++)
                 {
                     for (int y = 0; y <= lowerRightTile.Y - upperLeftTile.Y; y++)
@@ -215,13 +220,13 @@ namespace BPConstructs.Contents
                         clonedTiles[x, y] = new Tile();
                     }
                 }
-                
+
                 for (int i = 0; i <= lowerRightTile.X - upperLeftTile.X; i++)
                 {
                     string output = "";
                     for (int j = 0; j <= lowerRightTile.Y - upperLeftTile.Y; j++)
                     {
-                        if(WorldGen.InWorld(upperLeftTile.X + i, upperLeftTile.Y + j))
+                        if (WorldGen.InWorld(upperLeftTile.X + i, upperLeftTile.Y + j))
                         {
                             clonedTiles[i, j] = Framing.GetTileSafely(new Point(upperLeftTile.X + i, upperLeftTile.Y + j));
                             output += (upperLeftTile.ToString()) + " ";
@@ -261,10 +266,33 @@ namespace BPConstructs.Contents
     }
     internal class CopyModeUI : DraggablePanel
     {
+        UIPanel blueprintDiv;
+        private Dictionary<string, Tile[,]> clipBoard;
+
         public CopyModeUI()
         {
-            base.Width.Set(250f, 0f);
+            base.Width.Set(500f, 0f);
             base.Height.Set(250f, 0f);
+
+            clipBoard = new Dictionary<string, Tile[,]>();
+            blueprintDiv = new UIPanel();
+            blueprintDiv.Width.Set(500f, 0f);
+            blueprintDiv.Height.Set(250f, 0f);
+            blueprintDiv.Append(new UIText("No blueprints found"));
+            Append(blueprintDiv);
+        }
+
+        public bool AddBlueprint(string name, Tile[,] blueprint)
+        {
+            try
+            {
+                clipBoard.Add(name, blueprint);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -275,13 +303,14 @@ namespace BPConstructs.Contents
 
             base.Draw(spriteBatch);
         }
+
     }
+
     internal class ArchitectUI : UIState
     {
         CopyMode copyMode;
         ModeIcon btn;
         CopyModeUI copyModeUI;
-
         public ArchitectUI()
         {
             copyMode = new CopyMode();
