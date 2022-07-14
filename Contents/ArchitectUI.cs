@@ -132,82 +132,6 @@ namespace BPConstructs.Contents
             base.Draw(spriteBatch);
         }
 
-        public void DrawRect(SpriteBatch spriteBatch, bool fill)
-        {
-            Color color = new Color(255, 230, 26);
-            Rectangle rect = new Rectangle(0, 0, 1, 1);
-            Point upperLeftTile;
-            Point bottomRightTile;
-
-            if (isMouseDown)
-            {
-                upperLeftTile = new Point(
-                    Math.Min(startTile.X, lastMouseTile.X), 
-                    Math.Min(startTile.Y, lastMouseTile.Y));
-                bottomRightTile = new Point(
-                    Math.Max(startTile.X, lastMouseTile.X) + 1,
-                    Math.Max(startTile.Y, lastMouseTile.Y) + 1);
-            }
-            else
-            {
-                upperLeftTile = (Main.MouseWorld).ToTileCoordinates();
-                bottomRightTile = new Point(upperLeftTile.X + 1, upperLeftTile.Y + 1);
-            }
-
-            Vector2 upperLeftScreen = upperLeftTile.ToVector2() * 16f;
-            // Vector2 bottomRightScreen = bottomRight * 16f;
-            //upperLeftScreen -= Main.screenPosition;
-            Point offset = bottomRightTile - upperLeftTile;
-
-            if(fill)
-                spriteBatch.Draw(
-                    TextureAssets.MagicPixel.Value, 
-                    upperLeftScreen, 
-                    new Rectangle?(rect), 
-                    color * 0.6f, 
-                    0f, 
-                    Vector2.Zero, 
-                    16f * offset.ToVector2(), 
-                    SpriteEffects.None, 
-                    0f);
-
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
-                upperLeftScreen + Vector2.UnitX * -2f,  
-                new Microsoft.Xna.Framework.Rectangle?(rect), 
-                color, 
-                0f, 
-                Vector2.Zero, 
-                new Vector2(2f, offset.Y * 16f), 
-                SpriteEffects.None, 
-                0f);
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
-                upperLeftScreen + Vector2.UnitX * offset.X * 16f, 
-                new Microsoft.Xna.Framework.Rectangle?(rect), 
-                color, 
-                0f, 
-                Vector2.Zero, 
-                new Vector2(2f, offset.Y * 16f), 
-                SpriteEffects.None, 
-                0f);
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
-                upperLeftScreen + Vector2.UnitY * -2f, 
-                new Microsoft.Xna.Framework.Rectangle?(rect), 
-                color, 
-                0f, 
-                Vector2.Zero, 
-                new Vector2(offset.X * 16f, 2f), 
-                SpriteEffects.None, 
-                0f);
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, 
-                upperLeftScreen + Vector2.UnitY * offset.Y * 16f, 
-                new Microsoft.Xna.Framework.Rectangle?(rect), 
-                color, 
-                0f, 
-                Vector2.Zero, 
-                new Vector2(offset.X * 16f, 2f), 
-                SpriteEffects.None, 
-                0f);
-        }
         private void DrawBlueLaserGrid(SpriteBatch spriteBatch)
         {
             float num = Main.player[Main.myPlayer].velocity.Length();
@@ -343,6 +267,14 @@ namespace BPConstructs.Contents
             base.Height.Set(250f, 0f);
         }
 
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            PlayerInput.SetZoom_UI();
+
+            base.Draw(spriteBatch);
+        }
     }
     internal class ArchitectUI : UIState
     {
