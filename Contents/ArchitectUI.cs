@@ -247,7 +247,7 @@ namespace BPConstructs.Contents
             base.Update(gameTime);
         }
     }
-    internal class CopyModeIcon : UIElement
+    internal class ModeIcon : UIElement
     {
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -279,13 +279,13 @@ namespace BPConstructs.Contents
     internal class ArchitectUI : UIState
     {
         CopyMode copyMode;
-        CopyModeIcon btn;
+        ModeIcon btn;
         CopyModeUI copyModeUI;
 
         public ArchitectUI()
         {
             copyMode = new CopyMode();
-            btn = new CopyModeIcon();
+            btn = new ModeIcon();
             copyModeUI = new CopyModeUI();
         }
 
