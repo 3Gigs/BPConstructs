@@ -342,6 +342,7 @@ namespace BPConstructs.Contents
             base.Width.Set(250f, 0f);
             base.Height.Set(250f, 0f);
         }
+
     }
     internal class ArchitectUI : UIState
     {
