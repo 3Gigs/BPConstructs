@@ -119,12 +119,12 @@ namespace BPConstructs.Contents
             if (isMouseUp)
             {
                 Tile[,] tiles = CloneTiles();
-                for (int y = 0; y < tiles.GetLength(1); y++)
+                for (int i = 0; i < tiles.GetLength(0); i++)
                 {
                     string output = "";
-                    for (int x = 0; x < tiles.GetLength(0); x++)
+                    for (int j = 0; j < tiles.GetLength(1); j++)
                     {
-                        output += TileID.Search.GetName(tiles[x, y].TileType) + " ";
+                        output += TileID.Search.GetName(tiles[i, j].TileType);
                     }
                     LogManager.GetLogger("BPConstructs").Info(output);
                 }
@@ -305,6 +305,7 @@ namespace BPConstructs.Contents
         }
 
     }
+
     internal class ArchitectUI : UIState
     {
         CopyMode copyMode;
