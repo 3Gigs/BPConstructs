@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 using BPConstructs.Utils;
 using log4net;
 using Terraria.GameInput;
+using Terraria.Localization;
 
 namespace BPConstructs.Contents
 {
@@ -119,12 +120,12 @@ namespace BPConstructs.Contents
             if (isMouseUp)
             {
                 Tile[,] tiles = CloneTiles();
-                for (int i = 0; i < tiles.GetLength(0); i++)
+                for (int y = 0; y < tiles.GetLength(1); y++)
                 {
                     string output = "";
-                    for (int j = 0; j < tiles.GetLength(1); j++)
+                    for (int x = 0; x < tiles.GetLength(0); x++)
                     {
-                        output += TileID.Search.GetName(tiles[i, j].TileType);
+                        output += TileID.Search.GetName(tiles[x, y].TileType) + " ";
                     }
                     LogManager.GetLogger("BPConstructs").Info(output);
                 }
@@ -266,20 +267,47 @@ namespace BPConstructs.Contents
     }
     internal class CopyModeUI : DraggablePanel
     {
-        UIPanel blueprintDiv;
-        private Dictionary<string, Tile[,]> clipBoard;
+        UIPanel blueprintContainer;
+        //UIPanel lolol;
+        //UIPanel blueprintDiv;
+        private UIPanel searchboxPanel;
+        private static Dictionary<string, Tile[,]> clipBoard = new Dictionary<string, Tile[,]>();
+
 
         public CopyModeUI()
         {
             base.Width.Set(500f, 0f);
-            base.Height.Set(250f, 0f);
+            base.Height.Set(300f, 0f);
+            base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
 
-            clipBoard = new Dictionary<string, Tile[,]>();
-            blueprintDiv = new UIPanel();
-            blueprintDiv.Width.Set(500f, 0f);
-            blueprintDiv.Height.Set(250f, 0f);
-            blueprintDiv.Append(new UIText("No blueprints found"));
-            Append(blueprintDiv);
+            blueprintContainer = new UIPanel();
+            blueprintContainer.Width.Set(500f, 0f);
+            blueprintContainer.Height.Set(250f, 0f);
+            blueprintContainer.Top.Set(30f, 0f);
+            blueprintContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.9f;
+            Append(blueprintContainer);
+
+            //blueprintDiv = new UIPanel();
+            //blueprintDiv.Width.Set(100f, 0f);
+            //blueprintDiv.Height.Set(100f, 0f);
+            //blueprintContainer.Append(blueprintDiv);
+
+            //lolol = new UIPanel();
+            //lolol.Width.Set(100f, 0f);
+            //lolol.Height.Set(100f, 0f);
+            //lolol.Left.Set(lolol.Left.Pixels + 110f, 0f);
+            //blueprintContainer.Append(lolol);
+
+            UIElement header = new UIElement
+            {
+                Height = new StyleDimension(24f, 0f),
+                Width = new StyleDimension(0f, 1f)
+            };
+            header.SetPadding(0f);
+            this.AddSearchBar(header);
+            Append(header);
+
+            blueprintContainer.Append(new UIText("No blueprints found!"));
         }
 
         public bool AddBlueprint(string name, Tile[,] blueprint)
@@ -293,6 +321,40 @@ namespace BPConstructs.Contents
             {
                 return false;
             }
+        }
+
+        private void AddSearchBar(UIElement searchArea)
+        {
+            UIImageButton uIImageButton = new UIImageButton(Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Button_Search"))
+            {
+                VAlign = 0.5f,
+                HAlign = 0f
+            };
+            uIImageButton.SetHoverImage(Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Button_Search_Border"));
+            uIImageButton.SetVisibility(1f, 1f);
+            searchArea.Append(uIImageButton);
+
+            UIPanel searchPanel = new UIPanel
+            {
+                Width = new StyleDimension(0f - uIImageButton.Width.Pixels - 3f, 1f),
+                Height = new StyleDimension(0f, 1f),
+                VAlign = 0.5f,
+                HAlign = 1f
+            };
+            this.searchboxPanel = searchPanel;
+
+            UISearchBar searchBar = new UISearchBar(Language.GetText("UI.PlayerNameSlot"), 0.8f)
+            {
+                Width = new StyleDimension(0f, 1f),
+                Height = new StyleDimension(0f, 1f),
+                HAlign = 0f,
+                VAlign = 0.5f,
+                Left = new StyleDimension(0f, 0f),
+                IgnoresMouseInteraction = true
+            };
+            searchPanel.Append(searchBar);
+
+            searchArea.Append(searchPanel);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
