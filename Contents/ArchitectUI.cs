@@ -181,7 +181,6 @@ namespace BPConstructs.Contents
             //LogManager.GetLogger("BPConstructs").Info("Vec: " + (vec / 16f));
             //LogManager.GetLogger("BPConstructs").Info("Vec Tile: " + Framing.GetTileSafely(vec / 16f));
             //LogManager.GetLogger("BPConstructs").Info("Point: " + (point.ToVector2() * 16));
-            //LogManager.GetLogger("BPConstructs").Info("Point Tile: " + Framing.GetTileSafely(point.ToVector2() * 16));
 
             Vector2 zero = Vector2.Zero;
             value2.X = 2;
@@ -291,11 +290,12 @@ namespace BPConstructs.Contents
     }
     internal class CopyModeUI : DraggablePanel
     {
-        UIPanel blueprintContainer;
+        private static UIPanel blueprintContainer;
         //UIPanel lolol;
         //UIPanel blueprintDiv;
         private UIPanel searchboxPanel;
         private static Dictionary<string, Tile[,]> clipBoard = new Dictionary<string, Tile[,]>();
+        UIText noBlueprint = new UIText("No blueprints found!");
 
         public CopyModeUI()
         {
@@ -330,7 +330,10 @@ namespace BPConstructs.Contents
             this.AddSearchBar(header);
             Append(header);
 
-            blueprintContainer.Append(new UIText("No blueprints found!"));
+            if (clipBoard.Count == 0)
+            {
+                blueprintContainer.Append(noBlueprint);
+            }
         }
 
         public static bool AddBlueprint(string name, Tile[,] blueprint)
@@ -339,6 +342,16 @@ namespace BPConstructs.Contents
             {
                 clipBoard.Add(name, blueprint);
                 LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
+                LogManager.GetLogger("BPConstructs").Info("clipBoard: " + String.Join(Environment.NewLine, clipBoard));
+
+                UIPanel itemPanel = new UIPanel()
+                {
+                    Width = new StyleDimension(100f, 0f),
+                    Height = new StyleDimension(100f, 0f),
+                };
+
+                blueprintContainer.Append(itemPanel);
+
                 return true;
             }
             catch (ArgumentException)
@@ -386,6 +399,11 @@ namespace BPConstructs.Contents
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
+
+            if (clipBoard.Count == 0 && blueprintContainer.HasChild(noBlueprint))
+                blueprintContainer.Append(noBlueprint);
+            else if(blueprintContainer.HasChild(noBlueprint))
+                blueprintContainer.RemoveChild(noBlueprint);
 
             base.Draw(spriteBatch);
         }
