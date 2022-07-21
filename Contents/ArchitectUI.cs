@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -26,13 +27,15 @@ namespace BPConstructs.Contents
         Point lastScreenTile;
         private bool isMouseDown;
         private bool isMouseUp;
+        private bool isJustMouseDown;
         public static Tile[,] clonedTiles;
         // Fix UI Scaling from affecting DrawRect
 
-        public override void OnInitialize()
+        public CopyMode()
         {
             isMouseDown = false;
             isMouseUp = false;
+            isJustMouseDown = false;
             startTile = new Point(-1, -1);
             lastMouseTile = new Point(-1, -1);
             clonedTiles = new Tile[0, 0];
@@ -43,10 +46,8 @@ namespace BPConstructs.Contents
             startScreenTile = Main.MouseWorld.ToTileCoordinates();
             startScreenTile.X -= (int)screenPos.X / 16;
             startScreenTile.Y -= (int)screenPos.Y / 16;
-
-
-            base.OnInitialize();
         }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.End();
@@ -56,6 +57,18 @@ namespace BPConstructs.Contents
             Point mouseTileCoord = (Main.MouseWorld).ToTileCoordinates();
 
             DrawBlueLaserGrid(spriteBatch);
+
+            if (Main.mouseLeft)
+            {
+                isMouseDown = true;
+                isJustMouseDown = true;
+                isMouseUp = false;
+            }
+            else
+            {
+                isMouseUp = true;
+                isMouseDown = false;
+            }
 
             if (isMouseDown)
             {
@@ -101,7 +114,25 @@ namespace BPConstructs.Contents
 
                 DrawCloneLaser(spriteBatch, screenPos, upperLeftTile, bottomRightTile);
             }
-            else
+            else if (isMouseUp && isJustMouseDown)
+            {
+                Tile[,] tiles = CloneTiles();
+                CopyModeUI.AddBlueprint(new Random().Next(100000).ToString(), tiles);
+                for (int y = 0; y < tiles.GetLength(1); y++)
+                {
+                    string output = "";
+                    for (int x = 0; x < tiles.GetLength(0); x++)
+                    {
+                        output += TileID.Search.GetName(tiles[x, y].TileType) + " ";
+                    }
+                    LogManager.GetLogger("BPConstructs").Info(output);
+                }
+                startTile = mouseTileCoord;
+                lastMouseTile = mouseTileCoord;
+
+                isJustMouseDown = false;
+            }
+            else if (isMouseUp && !isJustMouseDown)
             {
                 screenPos = Main.screenPosition;
                 screenPos += new Vector2(-50f);
@@ -116,26 +147,16 @@ namespace BPConstructs.Contents
                     screenPos,
                     lastScreenTile,
                     lastScreenTile);
-            }
-            if (isMouseUp)
-            {
-                Tile[,] tiles = CloneTiles();
-                for (int y = 0; y < tiles.GetLength(1); y++)
-                {
-                    string output = "";
-                    for (int x = 0; x < tiles.GetLength(0); x++)
-                    {
-                        output += TileID.Search.GetName(tiles[x, y].TileType) + " ";
-                    }
-                    LogManager.GetLogger("BPConstructs").Info(output);
-                }
+
                 startTile = mouseTileCoord;
                 lastMouseTile = mouseTileCoord;
             }
 
+
             spriteBatch.End();
             spriteBatch.Begin();
             base.Draw(spriteBatch);
+
         }
 
         private void DrawBlueLaserGrid(SpriteBatch spriteBatch)
@@ -237,17 +258,20 @@ namespace BPConstructs.Contents
                 }
                 //LogManager.GetLogger("BPConstructs").Info("cloneTiles upperLeftTile: " + upperLeftTile.ToString() + " lowerRightTile" + lowerRightTile.ToString());
                 //LogManager.GetLogger("BPConstructs").Info("cloneTiles mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
+                LogManager.GetLogger("BPConstructs").Info("Clonetiles was called");
 
                 return clonedTiles;
             }
+            else
+            {
+                LogManager.GetLogger("BPConstructs").Info("LOL!!!!");
+            }
+
             return new Tile[0, 0];
         }
 
         public override void Update(GameTime gameTime)
         {
-            isMouseDown = Main.mouseLeft;
-            isMouseUp = Main.mouseLeftRelease;
-
             //LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
 
             base.Update(gameTime);
@@ -272,7 +296,6 @@ namespace BPConstructs.Contents
         //UIPanel blueprintDiv;
         private UIPanel searchboxPanel;
         private static Dictionary<string, Tile[,]> clipBoard = new Dictionary<string, Tile[,]>();
-
 
         public CopyModeUI()
         {
@@ -310,11 +333,12 @@ namespace BPConstructs.Contents
             blueprintContainer.Append(new UIText("No blueprints found!"));
         }
 
-        public bool AddBlueprint(string name, Tile[,] blueprint)
+        public static bool AddBlueprint(string name, Tile[,] blueprint)
         {
             try
             {
                 clipBoard.Add(name, blueprint);
+                LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
                 return true;
             }
             catch (ArgumentException)
