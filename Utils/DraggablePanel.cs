@@ -3,10 +3,11 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
+using BPConstructs.Contents;
 
 namespace BPConstructs.Utils
 {
-    internal class DraggablePanel : UIPanel
+    internal class DraggablePanel : UIPanelPlus
     {
         public bool isDragging;
         private Vector2 offset;
