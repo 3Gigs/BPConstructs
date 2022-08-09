@@ -29,8 +29,6 @@ namespace BPConstructs.Contents
                 BPCPlayer modPlayer = player.GetModPlayer<BPCPlayer>();
                 if (modPlayer.architectMode == true)
                 {
-                    LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
-
                     Append(btn);
                     Append(copyMode);
                     Append(copyModeUI);
