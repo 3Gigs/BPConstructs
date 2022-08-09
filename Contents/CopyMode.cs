@@ -71,8 +71,6 @@ namespace BPConstructs.Contents
                 isMouseDown = true;
                 isJustMouseDown = true;
                 isMouseUp = false;
-
-                LogManager.GetLogger("BPConstructs").Info("DRAW: " + Main.LocalPlayer.mouseInterface);
             }
             else
             {
@@ -91,8 +89,6 @@ namespace BPConstructs.Contents
                 {
                     lastMouseTile = mouseTileCoord;
                 }
-
-                LogManager.GetLogger("startTile" + startTile);
 
                 if (startScreenTile.X == -1 && startScreenTile.Y == -1)
                 {
@@ -186,10 +182,6 @@ namespace BPConstructs.Contents
             Rectangle value2 = new Rectangle(0, 18, 18, 18);
             vec -= Vector2.One;
 
-            //LogManager.GetLogger("BPConstructs").Info("Vec: " + (vec / 16f));
-            //LogManager.GetLogger("BPConstructs").Info("Vec Tile: " + Framing.GetTileSafely(vec / 16f));
-            //LogManager.GetLogger("BPConstructs").Info("Point: " + (point.ToVector2() * 16));
-
             Vector2 zero = Vector2.Zero;
             value2.X = 2;
             value2.Width = 16;
@@ -263,15 +255,12 @@ namespace BPConstructs.Contents
                     }
                     LogManager.GetLogger("BPConstructs").Info(output);
                 }
-                //LogManager.GetLogger("BPConstructs").Info("cloneTiles upperLeftTile: " + upperLeftTile.ToString() + " lowerRightTile" + lowerRightTile.ToString());
-                //LogManager.GetLogger("BPConstructs").Info("cloneTiles mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
-                LogManager.GetLogger("BPConstructs").Info("Clonetiles was called");
 
                 return clonedTiles;
             }
             else
             {
-                LogManager.GetLogger("BPConstructs").Info("Invalid CloneTile!");
+                LogManager.GetLogger("BPConstructs").Error("Invalid CloneTile!");
             }
 
             return new Tile[0, 0];
@@ -279,15 +268,12 @@ namespace BPConstructs.Contents
 
         public override void Update(GameTime gameTime)
         {
-            //LogManager.GetLogger("BPConstructs").Info("DrawRect mouse: " + Main.MouseWorld.ToTileCoordinates().ToString());
             base.Update(gameTime);
         }
     }
     internal class CopyModeUI : DraggablePanel
     {
         private static UIPanel blueprintContainer;
-        //UIPanel lolol;
-        //UIPanel blueprintDiv;
         private static Dictionary<string, Tile[,]> clipBoard = new Dictionary<string, Tile[,]>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
@@ -306,17 +292,6 @@ namespace BPConstructs.Contents
             blueprintContainer.Top.Set(30f, 0f);
             blueprintContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
             Append(blueprintContainer);
-
-            //blueprintDiv = new UIPanel();
-            //blueprintDiv.Width.Set(100f, 0f);
-            //blueprintDiv.Height.Set(100f, 0f);
-            //blueprintContainer.Append(blueprintDiv);
-
-            //lolol = new UIPanel();
-            //lolol.Width.Set(100f, 0f);
-            //lolol.Height.Set(100f, 0f);
-            //lolol.Left.Set(lolol.Left.Pixels + 110f, 0f);
-            //blueprintContainer.Append(lolol);
 
             UIElement header = new UIElement
             {

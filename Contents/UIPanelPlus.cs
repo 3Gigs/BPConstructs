@@ -24,8 +24,6 @@ namespace BPConstructs.Contents
 
 			Vector2 vector = position;
 
-			LogManager.GetLogger("BPConstructs").Info("OFFSET VALUE: " + offset);
-
 			return (float)Main.mouseX >= vector.X && (float)Main.mouseX <= vector.X + base.Width.Pixels && (float)Main.mouseY >= vector.Y && (float)Main.mouseY <= vector.Y + base.Height.Pixels;
 		}
 	}
