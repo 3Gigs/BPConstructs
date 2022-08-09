@@ -298,13 +298,13 @@ namespace BPConstructs.Contents
         {
             base.Width.Set(480f, 0f);
             base.Height.Set(300f, 0f);
-            base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
+            base.BackgroundColor = new Color(73, 94, 171) * 0.6f;
 
             blueprintContainer = new UIPanel();
             blueprintContainer.Width.Set(500f, 0f);
             blueprintContainer.Height.Set(250f, 0f);
             blueprintContainer.Top.Set(30f, 0f);
-            blueprintContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.9f;
+            blueprintContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
             Append(blueprintContainer);
 
             //blueprintDiv = new UIPanel();
