@@ -4,7 +4,6 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 using BPConstructs.Contents;
-using log4net;
 
 namespace BPConstructs
 {
@@ -12,7 +11,7 @@ namespace BPConstructs
     {
         private UserInterface UI;
         private ArchitectUI bar;
-        
+
         public override void UpdateUI(GameTime gameTime)
         {
             UI?.Update(gameTime);
@@ -37,7 +36,7 @@ namespace BPConstructs
 
         public override void Load()
         {
-            if(!Main.dedServ)
+            if (!Main.dedServ)
             {
                 bar = new ArchitectUI();
                 bar.Activate();
