@@ -9,7 +9,10 @@ using log4net;
 namespace BPConstructs.Contents
 {
     /**
-     * Stores all the UI states for convenience
+     * Stores all the UI instances
+     *
+     * Stores all UI instances here, allowing for convenience, communication 
+     * between classes, (i.e. not rendering the red grid if mouse inside the panel)
      */
     internal class ArchitectUI : UIState
     {
