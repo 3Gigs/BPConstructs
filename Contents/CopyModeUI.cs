@@ -14,8 +14,8 @@ namespace BPConstructs.Contents
 {
     internal class CopyModeUI : DraggablePanel
     {
-        private static UIPanel blueprintContainer;
-        private static Dictionary<string, Tile[,]> clipBoard = new Dictionary<string, Tile[,]>();
+        private static UIPanel blueprintUIContainer;
+        private static Dictionary<string, Tile[,]> blueprints = new Dictionary<string, Tile[,]>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
         private UIPanel searchBoxPanel;
@@ -27,12 +27,12 @@ namespace BPConstructs.Contents
             base.Height.Set(300f, 0f);
             base.BackgroundColor = new Color(73, 94, 171) * 0.6f;
 
-            blueprintContainer = new UIPanel();
-            blueprintContainer.Width.Set(500f, 0f);
-            blueprintContainer.Height.Set(250f, 0f);
-            blueprintContainer.Top.Set(30f, 0f);
-            blueprintContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
-            Append(blueprintContainer);
+            blueprintUIContainer = new UIPanel();
+            blueprintUIContainer.Width.Set(500f, 0f);
+            blueprintUIContainer.Height.Set(250f, 0f);
+            blueprintUIContainer.Top.Set(30f, 0f);
+            blueprintUIContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
+            Append(blueprintUIContainer);
 
             UIElement header = new UIElement
             {
@@ -43,9 +43,9 @@ namespace BPConstructs.Contents
             this.AddSearchBar(header);
             Append(header);
 
-            if (clipBoard.Count == 0)
+            if (blueprints.Count == 0)
             {
-                blueprintContainer.Append(noBlueprint);
+                blueprintUIContainer.Append(noBlueprint);
             }
         }
 
@@ -63,9 +63,9 @@ namespace BPConstructs.Contents
         {
             try
             {
-                clipBoard.Add(name, blueprint);
+                blueprints.Add(name, blueprint);
                 LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
-                LogManager.GetLogger("BPConstructs").Info("clipBoard: " + String.Join(Environment.NewLine, clipBoard));
+                LogManager.GetLogger("BPConstructs").Info("blueprints: " + String.Join(Environment.NewLine, blueprints));
 
                 UIPanel itemPanel = new UIPanel()
                 {
@@ -78,12 +78,12 @@ namespace BPConstructs.Contents
                     colCounter = 0;
                     rowCounter++;
                     itemPanel.Top.Set(110 * rowCounter, 0f);
-                    blueprintContainer.Append(itemPanel);
+                    blueprintUIContainer.Append(itemPanel);
                 }
 
                 itemPanel.Left.Set(110 * colCounter, 0f);
                 itemPanel.Top.Set(110 * rowCounter, 0f);
-                blueprintContainer.Append(itemPanel);
+                blueprintUIContainer.Append(itemPanel);
                 colCounter++;
 
                 return true;
@@ -146,10 +146,10 @@ namespace BPConstructs.Contents
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
 
-            if (clipBoard.Count == 0 && blueprintContainer.HasChild(noBlueprint))
-                blueprintContainer.Append(noBlueprint);
-            else if (blueprintContainer.HasChild(noBlueprint))
-                blueprintContainer.RemoveChild(noBlueprint);
+            if (blueprints.Count == 0 && blueprintUIContainer.HasChild(noBlueprint))
+                blueprintUIContainer.Append(noBlueprint);
+            else if (blueprintUIContainer.HasChild(noBlueprint))
+                blueprintUIContainer.RemoveChild(noBlueprint);
 
             base.Draw(spriteBatch);
         }
