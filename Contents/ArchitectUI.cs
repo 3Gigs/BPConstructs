@@ -8,6 +8,9 @@ using log4net;
 
 namespace BPConstructs.Contents
 {
+    /**
+     * Stores all the UI states for convenience
+     */
     internal class ArchitectUI : UIState
     {
         CopyMode copyMode;

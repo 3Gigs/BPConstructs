@@ -14,6 +14,9 @@ using Terraria.Localization;
 
 namespace BPConstructs.Contents
 {
+    /**
+     * Contains the CopyMode functionality
+     */
     internal class CopyMode : UIElement
     {
         public static bool forceNoDraw;
@@ -272,13 +275,13 @@ namespace BPConstructs.Contents
             color.A = 160;
             int width = tiles.GetLength(0);
             int height = tiles.GetLength(1);
-            for(int y = 0; y < height; y++)
+            for (int y = 0; y < height; y++)
             {
-                for(int x = 0; x < width; x++)
+                for (int x = 0; x < width; x++)
                 {
                     Tile tile = tiles[x, y];
 
-                    if(tile.WallType > 0)
+                    if (tile.WallType > 0)
                     {
                         Main.instance.LoadWall(tile.WallType);
                         Texture2D textureWall;
@@ -290,7 +293,7 @@ namespace BPConstructs.Contents
                         Vector2 pos = startPos + new Vector2(x * 16 - 8, y * 16 - 8);
                         sb.Draw(textureWall, pos * scale, value, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                     }
-                    else if(tile.HasTile)
+                    else if (tile.HasTile)
                     {
                         Main.instance.LoadTiles(tile.TileType);
                         Texture2D texture = TextureAssets.Tile[tile.TileType].Value;

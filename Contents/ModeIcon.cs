@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BPConstructs.Contents
 {
+    /**
+     * Represents the blueprint icon under the player
+     */
     internal class ModeIcon : UIElement
     {
         public override void Draw(SpriteBatch spriteBatch)
