@@ -63,9 +63,10 @@ namespace BPConstructs.Contents
         {
             try
             {
-                blueprints.Add(name, blueprint);
                 LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
                 LogManager.GetLogger("BPConstructs").Info("blueprints: " + String.Join(Environment.NewLine, blueprints));
+
+                blueprints.Add(name, blueprint);
 
                 UIPanel itemPanel = new UIPanel()
                 {
@@ -78,12 +79,13 @@ namespace BPConstructs.Contents
                     colCounter = 0;
                     rowCounter++;
                     itemPanel.Top.Set(110 * rowCounter, 0f);
-                    blueprintUIContainer.Append(itemPanel);
                 }
 
                 itemPanel.Left.Set(110 * colCounter, 0f);
                 itemPanel.Top.Set(110 * rowCounter, 0f);
+
                 blueprintUIContainer.Append(itemPanel);
+
                 colCounter++;
 
                 return true;
