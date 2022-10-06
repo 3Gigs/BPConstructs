@@ -166,6 +166,7 @@ namespace BPConstructs.Contents
             base.Draw(spriteBatch);
         }
 
+        // Draws the blue laser grid
         private void DrawBlueLaserGrid(SpriteBatch spriteBatch)
         {
             float num = Main.player[Main.myPlayer].velocity.Length();
@@ -193,7 +194,6 @@ namespace BPConstructs.Contents
             value2.Height = 16;
             zero.Y = 2f;
 
-            // Draws the blue laser grid
             for (int i = 0; i < num3; i++)
             {
                 for (int j = 0; j < num4; j++)
