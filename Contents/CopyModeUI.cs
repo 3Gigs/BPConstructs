@@ -89,8 +89,6 @@ namespace BPConstructs.Contents
 
                 blueprintUIContainer.Append(itemPanel);
 
-                CreateThumbnail(blueprint, new Vector2(itemPanel.Left.Pixels, itemPanel.Top.Pixels));
-
                 colCounter++;
 
                 return true;
@@ -147,7 +145,7 @@ namespace BPConstructs.Contents
             searchArea.Append(searchPanel);
         }
 
-        private static Texture2D CreateThumbnail(Tile[,] tiles, Vector2 startPos)
+        private void CreateThumbnail(Tile[,] tiles, Vector2 startPos)
         {
             int thumbnailWidth = 100;
             int thumbnailHeight = 100;
@@ -170,20 +168,7 @@ namespace BPConstructs.Contents
                 }
             }
 
-            RenderTarget2D renderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, thumbnailWidth, thumbnailHeight);
-            Main.instance.GraphicsDevice.SetRenderTarget(renderTarget);
-            Main.instance.GraphicsDevice.Clear(Color.Transparent);
-
             DrawPreview(Main.spriteBatch, tiles, new Vector2(100, 100));
-
-            Main.instance.GraphicsDevice.SetRenderTarget(null);
-
-            Texture2D mergedTexture = new Texture2D(Main.instance.GraphicsDevice, thumbnailWidth, thumbnailHeight);
-            Color[] content = new Color[thumbnailWidth * thumbnailHeight];
-            renderTarget.GetData<Color>(content);
-            mergedTexture.SetData<Color>(content);
-
-            return mergedTexture;
         }
 
         private static void DrawPreview(SpriteBatch sb, Tile[,] tiles, Vector2 startPos, float scale = 1f)
@@ -232,6 +217,11 @@ namespace BPConstructs.Contents
                 blueprintUIContainer.Append(noBlueprint);
             else if (blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.RemoveChild(noBlueprint);
+
+            foreach (KeyValuePair<string, Tile[,]> i in blueprints)
+            {
+                CreateThumbnail(i.Value, new Vector2(100, 100));
+            }
 
             base.Draw(spriteBatch);
         }
