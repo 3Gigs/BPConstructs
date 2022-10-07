@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
+using Terraria.GameContent;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BPConstructs.Utils;
@@ -86,6 +87,8 @@ namespace BPConstructs.Contents
 
                 blueprintUIContainer.Append(itemPanel);
 
+                DrawThumbnail(blueprint, new Vector2(itemPanel.Left.Pixels, itemPanel.Top.Pixels));
+
                 colCounter++;
 
                 return true;
@@ -140,6 +143,68 @@ namespace BPConstructs.Contents
             searchPanel.Append(searchBar);
 
             searchArea.Append(searchPanel);
+        }
+
+        private static void DrawThumbnail(Tile[,] tiles, Vector2 startPos)
+        {
+            int thumbnailWidth = 100;
+            int thumbnailHeight = 100;
+            int tileWidth = tiles.GetLength(0);
+            int tileHeight = tiles.GetLength(1);
+            float scale = 1.0F;
+            Vector2 offset = new Vector2();
+
+            if (tileWidth > thumbnailWidth || tileHeight > thumbnailHeight)
+            {
+                if (tileHeight > tileWidth)
+                {
+                    scale = (float)thumbnailWidth / tileHeight;
+                    offset.X = (thumbnailWidth - tileWidth * scale);
+                }
+                else
+                {
+                    scale = (float)thumbnailWidth / tileWidth;
+                    offset.Y = (thumbnailHeight - tileHeight * scale) / 2;
+                }
+            }
+
+            DrawPreview(Main.spriteBatch, tiles, new Vector2(100, 100));
+        }
+
+        private static void DrawPreview(SpriteBatch sb, Tile[,] tiles, Vector2 startPos, float scale = 1f)
+        {
+            Color color = Color.White;
+            color.A = 160;
+            int width = tiles.GetLength(0);
+            int height = tiles.GetLength(1);
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Tile tile = tiles[x, y];
+
+                    if (tile.WallType > 0)
+                    {
+                        Main.instance.LoadWall(tile.WallType);
+                        Texture2D textureWall;
+
+                        textureWall = TextureAssets.Wall[tile.WallType].Value;
+
+                        int wallFrame = Main.wallFrame[tile.WallType] * 180;
+                        Rectangle value = new Rectangle(tile.WallFrameX, tile.WallFrameY + wallFrame, 32, 32);
+                        Vector2 pos = startPos + new Vector2(x * 16 - 8, y * 16 - 8);
+                        sb.Draw(textureWall, pos * scale, value, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                    }
+                    else if (tile.HasTile)
+                    {
+                        Main.instance.LoadTiles(tile.TileType);
+                        Texture2D texture = TextureAssets.Tile[tile.TileType].Value;
+                        Rectangle? value = new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16);
+                        Vector2 pos = startPos + new Vector2(x * 16, y * 16);
+                        sb.Draw(texture, pos * scale, value, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                    }
+                }
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
