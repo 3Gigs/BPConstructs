@@ -1,3 +1,5 @@
+// Try calling BlueprintContainer.draw() somewhere
+xd
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -19,8 +21,6 @@ namespace BPConstructs.Contents
         private static Dictionary<string, Tile[,]> blueprints = new Dictionary<string, Tile[,]>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
-        private static Texture2D kekvv;
-        public static List<Texture2D> thumbnails;
         private UIPanel searchBoxPanel;
         UIText noBlueprint = new UIText("No blueprints found!");
 
@@ -71,11 +71,7 @@ namespace BPConstructs.Contents
 
                 blueprints.Add(name, blueprint);
 
-                UIPanel itemPanel = new UIPanel()
-                {
-                    Width = new StyleDimension(100f, 0f),
-                    Height = new StyleDimension(100f, 0f),
-                };
+                BPContainerPanel itemPanel = new BPContainerPanel(blueprint);
 
                 if (colCounter == 4)
                 {
@@ -145,33 +141,8 @@ namespace BPConstructs.Contents
             searchArea.Append(searchPanel);
         }
 
-        private void CreateThumbnail(Tile[,] tiles, Vector2 startPos)
-        {
-            int thumbnailWidth = 100;
-            int thumbnailHeight = 100;
-            int tileWidth = tiles.GetLength(0);
-            int tileHeight = tiles.GetLength(1);
-            float scale = 1.0F;
-            Vector2 offset = new Vector2();
 
-            if (tileWidth > thumbnailWidth || tileHeight > thumbnailHeight)
-            {
-                if (tileHeight > tileWidth)
-                {
-                    scale = (float)thumbnailWidth / tileHeight;
-                    offset.X = (thumbnailWidth - tileWidth * scale);
-                }
-                else
-                {
-                    scale = (float)thumbnailWidth / tileWidth;
-                    offset.Y = (thumbnailHeight - tileHeight * scale) / 2;
-                }
-            }
-
-            DrawPreview(Main.spriteBatch, tiles, new Vector2(100, 100));
-        }
-
-        private static void DrawPreview(SpriteBatch sb, Tile[,] tiles, Vector2 startPos, float scale = 1f)
+        public static void DrawPreview(SpriteBatch sb, Tile[,] tiles, Vector2 startPos, float scale = 1f)
         {
             Color color = Color.White;
             color.A = 160;
@@ -218,18 +189,12 @@ namespace BPConstructs.Contents
             else if (blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.RemoveChild(noBlueprint);
 
-            foreach (KeyValuePair<string, Tile[,]> i in blueprints)
-            {
-                CreateThumbnail(i.Value, new Vector2(100, 100));
-            }
-
             base.Draw(spriteBatch);
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
         }
     }
 
