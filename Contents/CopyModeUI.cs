@@ -1,5 +1,4 @@
 // Try calling BlueprintContainer.draw() somewhere
-xd
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -17,11 +16,11 @@ namespace BPConstructs.Contents
 {
     internal class CopyModeUI : DraggablePanel
     {
-        private static UIPanel blueprintUIContainer;
-        private static Dictionary<string, Tile[,]> blueprints = new Dictionary<string, Tile[,]>();
+        private static UIPanelPlus blueprintUIContainer;
+        private static Dictionary<string, Tile[,]> tiles = new Dictionary<string, Tile[,]>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
-        private UIPanel searchBoxPanel;
+        private UIPanelPlus searchBoxPanel;
         UIText noBlueprint = new UIText("No blueprints found!");
 
         public CopyModeUI()
@@ -30,7 +29,7 @@ namespace BPConstructs.Contents
             base.Height.Set(300f, 0f);
             base.BackgroundColor = new Color(73, 94, 171) * 0.6f;
 
-            blueprintUIContainer = new UIPanel();
+            blueprintUIContainer = new UIPanelPlus();
             blueprintUIContainer.Width.Set(500f, 0f);
             blueprintUIContainer.Height.Set(250f, 0f);
             blueprintUIContainer.Top.Set(30f, 0f);
@@ -46,7 +45,7 @@ namespace BPConstructs.Contents
             this.AddSearchBar(header);
             Append(header);
 
-            if (blueprints.Count == 0)
+            if (tiles.Count == 0)
             {
                 blueprintUIContainer.Append(noBlueprint);
             }
@@ -67,9 +66,9 @@ namespace BPConstructs.Contents
             try
             {
                 LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
-                LogManager.GetLogger("BPConstructs").Info("blueprints: " + String.Join(Environment.NewLine, blueprints));
+                LogManager.GetLogger("BPConstructs").Info("tiles: " + String.Join(Environment.NewLine, tiles));
 
-                blueprints.Add(name, blueprint);
+                tiles.Add(name, blueprint);
 
                 BPContainerPanel itemPanel = new BPContainerPanel(blueprint);
 
@@ -114,11 +113,11 @@ namespace BPConstructs.Contents
                 VAlign = 0.5f,
                 HAlign = 0f
             };
-            uIImageButton.SetHoverImage(Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Button_Search_Border"));
-            uIImageButton.SetVisibility(1f, 1f);
-            searchArea.Append(uIImageButton);
+            //uIImageButton.SetHoverImage(Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Button_Search_Border"));
+            //uIImageButton.SetVisibility(1f, 1f);
+            //searchArea.Append(uIImageButton);
 
-            UIPanel searchPanel = new UIPanel
+            UIPanelPlus searchPanel = new UIPanelPlus
             {
                 Width = new StyleDimension(0f - uIImageButton.Width.Pixels - 3f, 1f),
                 Height = new StyleDimension(0f, 1f),
@@ -184,12 +183,14 @@ namespace BPConstructs.Contents
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
 
-            if (blueprints.Count == 0 && blueprintUIContainer.HasChild(noBlueprint))
+            if (tiles.Count == 0 && blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.Append(noBlueprint);
             else if (blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.RemoveChild(noBlueprint);
-
             base.Draw(spriteBatch);
+
+            spriteBatch.End();
+            spriteBatch.Begin();
         }
 
         public override void Update(GameTime gameTime)

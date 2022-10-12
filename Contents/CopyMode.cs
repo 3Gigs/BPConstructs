@@ -20,8 +20,7 @@ namespace BPConstructs.Contents
     internal class CopyMode : UIElement
     {
         public static bool forceNoDraw;
-        private Point startTile;
-        private Point lastMouseTile;
+        private Point startTile; private Point lastMouseTile;
         private Vector2 screenPos;
         private Point startScreenTile;
         private Point lastScreenTile;
@@ -69,6 +68,7 @@ namespace BPConstructs.Contents
 
             DrawBlueLaserGrid(spriteBatch);
 
+            LogManager.GetLogger("BPConstructs").Info("forceNoDraw: " + forceNoDraw);
             if (Main.mouseLeft && !Main.LocalPlayer.mouseInterface && !forceNoDraw)
             {
                 isMouseDown = true;

@@ -7,7 +7,7 @@ using log4net;
 
 namespace BPConstructs.Contents
 {
-    internal class BPContainerPanel : UIPanel
+    internal class BPContainerPanel : UIPanelPlus
     {
         Tile[,] tiles;
 
@@ -51,6 +51,9 @@ namespace BPConstructs.Contents
 
             LogManager.GetLogger("BPConstructs").Info("Left Pixels: " + base.Left.Pixels);
             CreateThumbnail(tiles, new Vector2(this.Left.Pixels, this.Top.Pixels), spriteBatch);
+
+            spriteBatch.End();
+            spriteBatch.Begin();
 
             base.Draw(spriteBatch);
         }
