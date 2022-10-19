@@ -18,6 +18,7 @@ namespace BPConstructs.Contents
     {
         private static UIPanelPlus blueprintUIContainer;
         private static Dictionary<string, Tile[,]> tiles = new Dictionary<string, Tile[,]>();
+        private static List<BPContainerPanel> containerPanels = new List<BPContainerPanel>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
         private UIPanelPlus searchBoxPanel;
@@ -71,6 +72,7 @@ namespace BPConstructs.Contents
                 tiles.Add(name, blueprint);
 
                 BPContainerPanel itemPanel = new BPContainerPanel(blueprint);
+                containerPanels.Add(itemPanel);
 
                 if (colCounter == 4)
                 {
@@ -187,7 +189,14 @@ namespace BPConstructs.Contents
                 blueprintUIContainer.Append(noBlueprint);
             else if (blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.RemoveChild(noBlueprint);
+
+            foreach (var i in containerPanels)
+            {
+                i.thumbnailPos = new Vector2(base.Left.Pixels, base.Top.Pixels);
+            }
+
             base.Draw(spriteBatch);
+            LogManager.GetLogger("BPConstruct").Info(base.Left.Pixels);
 
             spriteBatch.End();
             spriteBatch.Begin();
