@@ -2,6 +2,7 @@ using Terraria;
 using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameContent;
+using Terraria.GameInput;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,14 +14,18 @@ namespace BPConstructs.Contents
         TexInfo[,] textures;
         float scale;
         Vector2 offset = new Vector2();
+        Texture2D makeThumbnailTexture;
+        Vector2 thumbSize;
 
         public ThumbnailImage(Tile[,] _tiles, Vector2 _thumbSize)
         {
             tiles = _tiles;
             textures = CreateThumbnail(_tiles);
+            thumbSize = _thumbSize;
             int tileWidth = tiles.GetLength(0) * 16;
             int tileHeight = tiles.GetLength(1) * 16;
             scale = 1f;
+            makeThumbnailTexture = this.MakeThumbnail();
             if (tileWidth > _thumbSize.X || tileHeight > _thumbSize.Y)
             {
                 if (tileHeight > tileWidth)
@@ -101,12 +106,61 @@ namespace BPConstructs.Contents
             return textures;
         }
 
-        void DrawPreview(SpriteBatch sb)
+
+        public Texture2D MakeThumbnail()
+        {
+            int desiredWidth = 100;
+            int desiredHeight = 100;
+
+            int actualWidth = textures.GetLength(0);
+            int actualHeight = textures.GetLength(1);
+
+            float scale = 1;
+            Vector2 offset = new Vector2();
+            if (actualWidth > desiredWidth || actualHeight > desiredHeight)
+            {
+                if (actualHeight > actualWidth)
+                {
+                    scale = (float)desiredWidth / actualHeight;
+                    offset.X = (desiredWidth - actualWidth * scale) / 2;
+                }
+                else
+                {
+                    scale = (float)desiredWidth / actualWidth;
+                    offset.Y = (desiredHeight - actualHeight * scale) / 2;
+                }
+            }
+            offset = offset / scale;
+
+            Main.spriteBatch.End();
+            RenderTarget2D renderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, desiredWidth, desiredHeight);
+            Main.instance.GraphicsDevice.SetRenderTarget(renderTarget);
+            Main.instance.GraphicsDevice.Clear(Color.Transparent);
+            Main.spriteBatch.Begin();
+
+            CopyModeUI.DrawPreview(Main.spriteBatch, tiles, offset, scale);
+
+            Main.spriteBatch.End();
+            Main.instance.GraphicsDevice.SetRenderTarget(null);
+            Main.spriteBatch.Begin();
+
+            Texture2D mergedTexture = new Texture2D(Main.instance.GraphicsDevice, desiredWidth, desiredHeight);
+            Color[] content = new Color[desiredWidth * desiredHeight];
+            renderTarget.GetData<Color>(content);
+            mergedTexture.SetData<Color>(content);
+            return mergedTexture;
+        }
+
+        void DrawPreview(SpriteBatch sb, Vector2 startPos, float scale = 1f)
         {
             int width = textures.GetLength(0);
             int height = textures.GetLength(1);
             Color color = Color.White;
             color.A = 160;
+
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            PlayerInput.SetZoom_UI();
 
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
@@ -115,21 +169,52 @@ namespace BPConstructs.Contents
                     if (texture.wallFrame != null)
                     {
                         Rectangle value = new Rectangle((int)texture.wallFrame?.X, (int)texture.wallFrame?.Y, 32, 32);
-                        Vector2 pos = new Vector2(100, 100) + new Vector2(x * 16, y * 16);
-                        sb.Draw(texture.texture, pos * this.scale, value, color, 0f, Vector2.Zero, this.scale, SpriteEffects.None, 0f);
+                        Vector2 pos = startPos + new Vector2(x * 16, y * 16);
+                        sb.Draw(texture.texture, pos * scale, value, color, 0f, Vector2.Zero, this.scale, SpriteEffects.None, 0f);
                     }
                     else if (texture.tileFrame != null)
                     {
                         Rectangle value = new Rectangle((int)texture.tileFrame?.X, (int)texture.tileFrame?.Y, 16, 16);
-                        Vector2 pos = new Vector2(100, 100) + new Vector2(x * 16, y * 16);
-                        sb.Draw(texture.texture, pos * this.scale, value, color, 0f, Vector2.Zero, this.scale, SpriteEffects.None, 0f);
+                        Vector2 pos = startPos + new Vector2(x * 16, y * 16);
+                        sb.Draw(texture.texture, pos * scale, value, color, 0f, Vector2.Zero, this.scale, SpriteEffects.None, 0f);
                     }
                 }
+            sb.End();
+            sb.Begin();
         }
 
-        protected override void DrawSelf(SpriteBatch sb)
+        public override void Draw(SpriteBatch sb)
         {
-            this.DrawPreview(sb);
+            int tileWidth = tiles.GetLength(0) * 16;
+            int tileHeight = tiles.GetLength(1) * 16;
+            Vector2 size = new Vector2(tileWidth, tileHeight);
+
+            sb.End();
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            PlayerInput.SetZoom_UI();
+
+            if (tileWidth > thumbSize.X || tileHeight > thumbSize.Y)
+            {
+                if (tileHeight > tileWidth)
+                {
+                    scale = (float)thumbSize.X / tileHeight;
+                    offset.X = (thumbSize.X - tileWidth * scale) / 2;
+                }
+                else
+                {
+                    scale = (float)thumbSize.X / tileWidth;
+                    offset.Y = (thumbSize.Y - tileHeight * scale) / 2;
+                }
+            }
+            CalculatedStyle pos = base.GetDimensions();
+            //CopyModeUI.DrawPreview(sb, tiles, offset, scale = 0.2f);
+            sb.Draw(makeThumbnailTexture, base.GetDimensions().Position(), Color.White);
+
+            log4net.LogManager.GetLogger("BPConstructs").Info("Calculated pos x: " + (pos.X * (1 + Main.UIScale)));
+            log4net.LogManager.GetLogger("BPConstructs").Info("UIScale: " + Main.UIScale);
+
+            sb.End();
+            sb.Begin();
         }
     }
 }

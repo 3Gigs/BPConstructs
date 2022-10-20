@@ -68,7 +68,6 @@ namespace BPConstructs.Contents
 
             DrawBlueLaserGrid(spriteBatch);
 
-            LogManager.GetLogger("BPConstructs").Info("forceNoDraw: " + forceNoDraw);
             if (Main.mouseLeft && !Main.LocalPlayer.mouseInterface && !forceNoDraw)
             {
                 isMouseDown = true;

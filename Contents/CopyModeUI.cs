@@ -196,7 +196,6 @@ namespace BPConstructs.Contents
             }
 
             base.Draw(spriteBatch);
-            LogManager.GetLogger("BPConstruct").Info(base.Left.Pixels);
 
             spriteBatch.End();
             spriteBatch.Begin();
