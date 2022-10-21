@@ -20,8 +20,6 @@ namespace BPConstructs.Contents
             tiles = _tiles;
             textures = CreateThumbnail(_tiles);
             thumbSize = _thumbSize;
-            int tileWidth = tiles.GetLength(0) * 16;
-            int tileHeight = tiles.GetLength(1) * 16;
             makeThumbnailTexture = this.MakeThumbnail();
         }
 
@@ -176,7 +174,6 @@ namespace BPConstructs.Contents
             PlayerInput.SetZoom_UI();
 
             CalculatedStyle pos = base.GetDimensions();
-            //CopyModeUI.DrawPreview(sb, tiles, offset, scale = 0.2f);
             sb.Draw(makeThumbnailTexture, base.GetDimensions().Position(), Color.White);
 
             log4net.LogManager.GetLogger("BPConstructs").Info("Calculated pos x: " + (pos.X * (1 + Main.UIScale)));
