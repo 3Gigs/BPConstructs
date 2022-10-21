@@ -17,7 +17,6 @@ namespace BPConstructs.Contents
     internal class CopyModeUI : DraggablePanel
     {
         private static UIPanelPlus blueprintUIContainer;
-        private static Dictionary<string, Tile[,]> tiles = new Dictionary<string, Tile[,]>();
         private static List<BPContainerPanel> containerPanels = new List<BPContainerPanel>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
@@ -46,7 +45,7 @@ namespace BPConstructs.Contents
             this.AddSearchBar(header);
             Append(header);
 
-            if (tiles.Count == 0)
+            if (containerPanels.Count == 0)
             {
                 blueprintUIContainer.Append(noBlueprint);
             }
@@ -67,9 +66,7 @@ namespace BPConstructs.Contents
             try
             {
                 LogManager.GetLogger("BPConstructs").Info("AddBlueprint was called");
-                LogManager.GetLogger("BPConstructs").Info("tiles: " + String.Join(Environment.NewLine, tiles));
-
-                tiles.Add(name, blueprint);
+                // LogManager.GetLogger("BPConstructs").Info("tiles: " + String.Join(Environment.NewLine, tiles));
 
                 BPContainerPanel itemPanel = new BPContainerPanel(blueprint);
                 containerPanels.Add(itemPanel);
@@ -185,7 +182,7 @@ namespace BPConstructs.Contents
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
 
-            if (tiles.Count == 0 && blueprintUIContainer.HasChild(noBlueprint))
+            if (containerPanels.Count == 0 && blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.Append(noBlueprint);
             else if (blueprintUIContainer.HasChild(noBlueprint))
                 blueprintUIContainer.RemoveChild(noBlueprint);

@@ -8,15 +8,15 @@ namespace BPConstructs.Contents
 {
     internal class BPContainerPanel : UIPanelPlus
     {
-        Tile[,] tiles;
+        Tile[,] _tiles;
         Vector2 _thumbnailPos;
         ThumbnailImage thumbnail;
 
-        public BPContainerPanel(Tile[,] _tiles)
+        public BPContainerPanel(Tile[,] tiles)
         {
             Width.Set(100f, 0f);
             Height.Set(100f, 0f);
-            tiles = _tiles;
+            _tiles = tiles;
             _thumbnailPos = new Vector2(0f, 0f);
             thumbnail = new ThumbnailImage(tiles, new Vector2(100, 100));
             this.Append(thumbnail);
@@ -32,6 +32,12 @@ namespace BPConstructs.Contents
             {
                 _thumbnailPos = value;
             }
+        }
+
+        public Tile[,] tiles
+        {
+            get { return _tiles; }
+            set { _tiles = value; }
         }
 
         // private void CreateThumbnail(Tile[,] tiles, Vector2 startPos, SpriteBatch sb)
