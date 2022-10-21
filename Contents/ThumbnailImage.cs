@@ -89,8 +89,8 @@ namespace BPConstructs.Contents
 
         public Texture2D MakeThumbnail()
         {
-            int desiredWidth = 100;
-            int desiredHeight = 100;
+            int desiredWidth = 80;
+            int desiredHeight = 80;
 
             int actualWidth = textures.GetLength(0) * 16;
             int actualHeight = textures.GetLength(1) * 16;
