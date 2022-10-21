@@ -187,11 +187,6 @@ namespace BPConstructs.Contents
             else if (bpPanelsContainer.HasChild(noBlueprint))
                 bpPanelsContainer.RemoveChild(noBlueprint);
 
-            foreach (var i in bpPanels)
-            {
-                i.thumbnailPos = new Vector2(base.Left.Pixels, base.Top.Pixels);
-            }
-
             base.Draw(spriteBatch);
 
             spriteBatch.End();

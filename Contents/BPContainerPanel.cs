@@ -9,7 +9,6 @@ namespace BPConstructs.Contents
     internal class BPContainerPanel : UIPanelPlus
     {
         Tile[,] _tiles;
-        Vector2 _thumbnailPos;
         ThumbnailImage thumbnail;
 
         public BPContainerPanel(Tile[,] tiles)
@@ -17,21 +16,8 @@ namespace BPConstructs.Contents
             Width.Set(100f, 0f);
             Height.Set(100f, 0f);
             _tiles = tiles;
-            _thumbnailPos = new Vector2(0f, 0f);
             thumbnail = new ThumbnailImage(tiles, new Vector2(100, 100));
             this.Append(thumbnail);
-        }
-
-        public Vector2 thumbnailPos
-        {
-            get
-            {
-                return _thumbnailPos;
-            }
-            set
-            {
-                _thumbnailPos = value;
-            }
         }
 
         public Tile[,] tiles
