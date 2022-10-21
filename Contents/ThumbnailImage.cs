@@ -12,8 +12,6 @@ namespace BPConstructs.Contents
     {
         public Tile[,] tiles;
         TexInfo[,] textures;
-        float scale;
-        Vector2 offset = new Vector2();
         Texture2D makeThumbnailTexture;
         Vector2 thumbSize;
 
@@ -24,23 +22,7 @@ namespace BPConstructs.Contents
             thumbSize = _thumbSize;
             int tileWidth = tiles.GetLength(0) * 16;
             int tileHeight = tiles.GetLength(1) * 16;
-            scale = 1f;
             makeThumbnailTexture = this.MakeThumbnail();
-            if (tileWidth > _thumbSize.X || tileHeight > _thumbSize.Y)
-            {
-                if (tileHeight > tileWidth)
-                {
-                    scale = (float)_thumbSize.X / tileHeight;
-                    offset.X = (_thumbSize.X - tileWidth * scale) / 2;
-                }
-                else
-                {
-                    scale = (float)_thumbSize.X / tileWidth;
-                    offset.Y = (_thumbSize.Y - tileHeight * scale) / 2;
-                }
-            }
-
-            offset /= scale;
         }
 
         struct TexInfo
@@ -112,8 +94,8 @@ namespace BPConstructs.Contents
             int desiredWidth = 100;
             int desiredHeight = 100;
 
-            int actualWidth = textures.GetLength(0);
-            int actualHeight = textures.GetLength(1);
+            int actualWidth = textures.GetLength(0) * 16;
+            int actualHeight = textures.GetLength(1) * 16;
 
             float scale = 1;
             Vector2 offset = new Vector2();
@@ -170,13 +152,13 @@ namespace BPConstructs.Contents
                     {
                         Rectangle value = new Rectangle((int)texture.wallFrame?.X, (int)texture.wallFrame?.Y, 32, 32);
                         Vector2 pos = startPos + new Vector2(x * 16, y * 16);
-                        sb.Draw(texture.texture, pos * scale, value, color, 0f, Vector2.Zero, this.scale, SpriteEffects.None, 0f);
+                        sb.Draw(texture.texture, pos * scale, value, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                     }
                     else if (texture.tileFrame != null)
                     {
                         Rectangle value = new Rectangle((int)texture.tileFrame?.X, (int)texture.tileFrame?.Y, 16, 16);
                         Vector2 pos = startPos + new Vector2(x * 16, y * 16);
-                        sb.Draw(texture.texture, pos * scale, value, color, 0f, Vector2.Zero, this.scale, SpriteEffects.None, 0f);
+                        sb.Draw(texture.texture, pos * scale, value, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                     }
                 }
             sb.End();
@@ -193,19 +175,6 @@ namespace BPConstructs.Contents
             sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
 
-            if (tileWidth > thumbSize.X || tileHeight > thumbSize.Y)
-            {
-                if (tileHeight > tileWidth)
-                {
-                    scale = (float)thumbSize.X / tileHeight;
-                    offset.X = (thumbSize.X - tileWidth * scale) / 2;
-                }
-                else
-                {
-                    scale = (float)thumbSize.X / tileWidth;
-                    offset.Y = (thumbSize.Y - tileHeight * scale) / 2;
-                }
-            }
             CalculatedStyle pos = base.GetDimensions();
             //CopyModeUI.DrawPreview(sb, tiles, offset, scale = 0.2f);
             sb.Draw(makeThumbnailTexture, base.GetDimensions().Position(), Color.White);
