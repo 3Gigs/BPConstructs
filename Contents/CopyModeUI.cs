@@ -16,8 +16,8 @@ namespace BPConstructs.Contents
 {
     internal class CopyModeUI : DraggablePanel
     {
-        private static UIPanelPlus blueprintUIContainer;
-        private static List<BPContainerPanel> containerPanels = new List<BPContainerPanel>();
+        private static UIPanelPlus bpPanelsContainer;
+        private static List<BPContainerPanel> bpPanels = new List<BPContainerPanel>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
         private UIPanelPlus searchBoxPanel;
@@ -29,12 +29,12 @@ namespace BPConstructs.Contents
             base.Height.Set(300f, 0f);
             base.BackgroundColor = new Color(73, 94, 171) * 0.6f;
 
-            blueprintUIContainer = new UIPanelPlus();
-            blueprintUIContainer.Width.Set(500f, 0f);
-            blueprintUIContainer.Height.Set(250f, 0f);
-            blueprintUIContainer.Top.Set(30f, 0f);
-            blueprintUIContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
-            Append(blueprintUIContainer);
+            bpPanelsContainer = new UIPanelPlus();
+            bpPanelsContainer.Width.Set(500f, 0f);
+            bpPanelsContainer.Height.Set(250f, 0f);
+            bpPanelsContainer.Top.Set(30f, 0f);
+            bpPanelsContainer.BackgroundColor = base.BackgroundColor = new Color(73, 94, 171) * 0.7f;
+            Append(bpPanelsContainer);
 
             UIElement header = new UIElement
             {
@@ -45,9 +45,9 @@ namespace BPConstructs.Contents
             this.AddSearchBar(header);
             Append(header);
 
-            if (containerPanels.Count == 0)
+            if (bpPanels.Count == 0)
             {
-                blueprintUIContainer.Append(noBlueprint);
+                bpPanelsContainer.Append(noBlueprint);
             }
         }
 
@@ -69,7 +69,7 @@ namespace BPConstructs.Contents
                 // LogManager.GetLogger("BPConstructs").Info("tiles: " + String.Join(Environment.NewLine, tiles));
 
                 BPContainerPanel itemPanel = new BPContainerPanel(blueprint);
-                containerPanels.Add(itemPanel);
+                bpPanels.Add(itemPanel);
 
                 if (colCounter == 4)
                 {
@@ -81,7 +81,7 @@ namespace BPConstructs.Contents
                 itemPanel.Left.Set(110 * colCounter, 0f);
                 itemPanel.Top.Set(110 * rowCounter, 0f);
 
-                blueprintUIContainer.Append(itemPanel);
+                bpPanelsContainer.Append(itemPanel);
 
                 colCounter++;
 
@@ -182,12 +182,12 @@ namespace BPConstructs.Contents
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
 
-            if (containerPanels.Count == 0 && blueprintUIContainer.HasChild(noBlueprint))
-                blueprintUIContainer.Append(noBlueprint);
-            else if (blueprintUIContainer.HasChild(noBlueprint))
-                blueprintUIContainer.RemoveChild(noBlueprint);
+            if (bpPanels.Count == 0 && bpPanelsContainer.HasChild(noBlueprint))
+                bpPanelsContainer.Append(noBlueprint);
+            else if (bpPanelsContainer.HasChild(noBlueprint))
+                bpPanelsContainer.RemoveChild(noBlueprint);
 
-            foreach (var i in containerPanels)
+            foreach (var i in bpPanels)
             {
                 i.thumbnailPos = new Vector2(base.Left.Pixels, base.Top.Pixels);
             }
