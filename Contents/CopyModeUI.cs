@@ -164,7 +164,7 @@ namespace BPConstructs.Contents
                         Vector2 pos = startPos + new Vector2(x * 16 - 8, y * 16 - 8);
                         sb.Draw(textureWall, pos * scale, value, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                     }
-                    else if (tile.HasTile)
+                    if (tile.HasTile)
                     {
                         Main.instance.LoadTiles(tile.TileType);
                         Texture2D texture = TextureAssets.Tile[tile.TileType].Value;
