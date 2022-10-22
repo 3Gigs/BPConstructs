@@ -16,7 +16,7 @@ namespace BPConstructs.Contents
 {
     internal class CopyModeUI : DraggablePanel
     {
-        private static UIPanelPlus bpPanelsContainer;
+        private static ScrollablePanel bpPanelsContainer;
         private static List<BPContainerPanel> bpPanels = new List<BPContainerPanel>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
@@ -25,11 +25,11 @@ namespace BPConstructs.Contents
 
         public CopyModeUI()
         {
-            base.Width.Set(480f, 0f);
+            base.Width.Set(500f, 0f);
             base.Height.Set(300f, 0f);
             base.BackgroundColor = new Color(73, 94, 171) * 0.6f;
 
-            bpPanelsContainer = new UIPanelPlus();
+            bpPanelsContainer = new ScrollablePanel();
             bpPanelsContainer.Width.Set(500f, 0f);
             bpPanelsContainer.Height.Set(250f, 0f);
             bpPanelsContainer.Top.Set(30f, 0f);
