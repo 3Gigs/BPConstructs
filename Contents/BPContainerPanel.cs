@@ -1,12 +1,14 @@
 using Terraria;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameInput;
+using Terraria.GameContent.UI.Elements;
+using Terraria.UI;
 using Microsoft.Xna.Framework;
 using log4net;
 
 namespace BPConstructs.Contents
 {
-    internal class BPContainerPanel : UIPanelPlus
+    internal class BPContainerPanel : UIPanel
     {
         Tile[,] _tiles;
         ThumbnailImage thumbnail;

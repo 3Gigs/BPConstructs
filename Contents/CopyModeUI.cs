@@ -21,7 +21,7 @@ namespace BPConstructs.Contents
         private static int colCounter = 0;
         private static int rowCounter = 0;
         private UIPanelPlus searchBoxPanel;
-        UIText noBlueprint = new UIText("No blueprints found!");
+        //UIText noBlueprint = new UIText("No blueprints found!");
 
         public CopyModeUI()
         {
@@ -47,7 +47,7 @@ namespace BPConstructs.Contents
 
             if (bpPanels.Count == 0)
             {
-                bpPanelsContainer.Append(noBlueprint);
+                //bpPanelsContainer.Append(noBlueprint);
             }
         }
 
@@ -182,11 +182,11 @@ namespace BPConstructs.Contents
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
             PlayerInput.SetZoom_UI();
 
-            if (bpPanels.Count == 0 && bpPanelsContainer.HasChild(noBlueprint))
-                bpPanelsContainer.Append(noBlueprint);
-            else if (bpPanelsContainer.HasChild(noBlueprint))
-                bpPanelsContainer.RemoveChild(noBlueprint);
-
+            //            if (bpPanels.Count == 0 && bpPanelsContainer.HasChild(noBlueprint))
+            //                bpPanelsContainer.Append(noBlueprint);
+            //            else if (bpPanelsContainer.HasChild(noBlueprint))
+            //                bpPanelsContainer.RemoveChild(noBlueprint);
+            //
             base.Draw(spriteBatch);
 
             spriteBatch.End();

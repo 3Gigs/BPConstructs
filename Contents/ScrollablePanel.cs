@@ -6,7 +6,7 @@ using log4net;
 // holy shit terraria
 namespace BPConstructs.Contents
 {
-    internal class ScrollablePanel : UIPanelPlus
+    internal class ScrollablePanel : UIPanel
     {
         UIScrollbar _scrollbar;
         bool _isScrollbarAttached;
@@ -17,21 +17,23 @@ namespace BPConstructs.Contents
             _bpList = new UIList
             {
                 Width = new StyleDimension(0f, 1f),
-                Height = new StyleDimension(-30f, 1f),
+                Height = new StyleDimension(0f, 1f),
+                VAlign = 1,
+                HAlign = 0,
             };
             this.Append(_bpList);
             _scrollbar = new UIScrollbar
             {
-                Height = new StyleDimension(0f, 1f),
+                Height = new StyleDimension(0f, 0.825f),
                 Top = new StyleDimension(0f, 0f),
-                VAlign = 1f,
+                VAlign = 0f,
                 HAlign = 1f,
             };
             _scrollbar.Left.Set(0f, 0);
             _scrollbar.SetView(100f, 1000f);
             _scrollbar.Height.Set(-1f, 1f);
-            this.Append(_scrollbar);
             _bpList.SetScrollbar(_scrollbar);
+            this.Append(_scrollbar);
         }
 
         public static bool AddBlueprint(string name, Tile[,] blueprint)
