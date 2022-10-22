@@ -1,6 +1,7 @@
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using Terraria.ModLoader.UI.Elements;
 using log4net;
 
 // holy shit terraria
@@ -10,11 +11,11 @@ namespace BPConstructs.Contents
     {
         UIScrollbar _scrollbar;
         bool _isScrollbarAttached;
-        static UIList _bpList;
+        static UIGrid _bpList;
 
         public ScrollablePanel()
         {
-            _bpList = new UIList
+            _bpList = new UIGrid
             {
                 Width = new StyleDimension(0f, 1f),
                 Height = new StyleDimension(0f, 1f),
@@ -29,8 +30,8 @@ namespace BPConstructs.Contents
                 VAlign = 0f,
                 HAlign = 1f,
             };
-            _scrollbar.Left.Set(0f, 0);
             _scrollbar.SetView(100f, 1000f);
+            _scrollbar.Left.Set(0f, 0);
             _scrollbar.Height.Set(-1f, 1f);
             _bpList.SetScrollbar(_scrollbar);
             this.Append(_scrollbar);
