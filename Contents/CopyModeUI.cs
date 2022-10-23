@@ -16,7 +16,7 @@ namespace BPConstructs.Contents
 {
     internal class CopyModeUI : DraggablePanel
     {
-        private static ScrollablePanel bpPanelsContainer;
+        private static BPPaginatedGrid<BPContainerPanel> bpPanelsContainer;
         private static List<BPContainerPanel> bpPanels = new List<BPContainerPanel>();
         private static int colCounter = 0;
         private static int rowCounter = 0;
@@ -29,7 +29,7 @@ namespace BPConstructs.Contents
             base.Height.Set(300f, 0f);
             base.BackgroundColor = new Color(73, 94, 171) * 0.6f;
 
-            bpPanelsContainer = new ScrollablePanel();
+            bpPanelsContainer = new BPPaginatedGrid<BPContainerPanel>();
             bpPanelsContainer.Width.Set(500f, 0f);
             bpPanelsContainer.Height.Set(250f, 0f);
             bpPanelsContainer.Top.Set(30f, 0f);
@@ -59,6 +59,13 @@ namespace BPConstructs.Contents
         public float Y
         {
             get { return base.Top.Pixels; }
+        }
+
+
+        public static bool AppendBlueprint(Tile[,] blueprint)
+        {
+            bpPanelsContainer.AddElement(new BPContainerPanel(blueprint));
+            return true;
         }
 
         public static bool AddBlueprint(string name, Tile[,] blueprint)

@@ -125,7 +125,7 @@ namespace BPConstructs.Contents
             else if (isMouseUp && isJustMouseDown) // Just released mouse
             {
                 Tile[,] tiles = CloneTiles();
-                ScrollablePanel.AddBlueprint(new Random().Next(100000).ToString(), tiles);
+                CopyModeUI.AppendBlueprint(tiles);
                 for (int y = 0; y < tiles.GetLength(1); y++)
                 {
                     string output = "";
