@@ -8,17 +8,26 @@ using log4net;
 
 namespace BPConstructs.Contents
 {
-    internal class BPContainerPanel : UIPanel
+    internal class BPContainerPanel : UIElement
     {
         Tile[,] _tiles;
         ThumbnailImage thumbnail;
+        UIImagePlus _borders;
+        UIImagePlus _borderSelect;
 
         public BPContainerPanel(Tile[,] tiles)
         {
             Width.Set(100f, 0f);
             Height.Set(100f, 0f);
             _tiles = tiles;
-            thumbnail = new ThumbnailImage(tiles, new Vector2(100, 100));
+            _borders = new UIImagePlus((Texture2D)Main.Assets.Request<Texture2D>("Images/UI/Bestiary/Slot_Selection"))
+            {
+                IgnoresMouseInteraction = true
+            };
+            thumbnail = new ThumbnailImage(tiles, new Vector2(100, 100))
+            {
+                IgnoresMouseInteraction = true
+            };
             this.Append(thumbnail);
         }
 
@@ -40,6 +49,21 @@ namespace BPConstructs.Contents
 
             spriteBatch.End();
             spriteBatch.Begin();
+        }
+
+        public override void MouseOver(UIMouseEvent evt)
+        {
+            base.MouseOver(evt);
+            if (!this.Elements.Contains(this._borders))
+            {
+                this.Append(this._borders);
+            }
+        }
+
+        public override void MouseOut(UIMouseEvent evt)
+        {
+            base.MouseOut(evt);
+            this.RemoveChild(this._borders);
         }
     }
 }
